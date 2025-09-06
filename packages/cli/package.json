@@ -1,0 +1,29 @@
+{
+  "name": "@reviewflow/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "review": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite-node src/index.ts",
+    "build": "vite build",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@reviewflow/shared": "workspace:*",
+    "commander": "^11.1.0",
+    "open": "^9.1.0",
+    "chalk": "^5.3.0",
+    "ora": "^7.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "vite": "^5.0.0",
+    "vite-node": "^1.0.0"
+  }
+}

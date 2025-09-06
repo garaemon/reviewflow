@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__serena__list_dir",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm --filter @reviewflow/cli build)",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_type",
+      "Bash(pnpm --filter @reviewflow/backend dev)",
+      "mcp__container-use__environment_create"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
