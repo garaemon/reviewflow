@@ -34,7 +34,7 @@ export interface ReviewSession {
   files: FileDiff[]
 }
 
-export type ReviewStatus = 'pending' | 'reviewed' | 'noted'
+export type ReviewStatus = 'reviewed' | 'unreviewed'
 
 export interface ReviewNote {
   id: string
