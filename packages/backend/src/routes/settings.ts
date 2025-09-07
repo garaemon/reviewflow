@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { join } from 'path'
-import { readFileSync, writeFileSync, existsSync } from 'fs'
+import { join, dirname } from 'path'
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
 import type { ReviewConfig } from '@reviewflow/shared'
 
 const router = Router()
@@ -65,6 +65,12 @@ router.post('/', (req, res) => {
     }
     
     const mergedConfig = { ...existingConfig, ...config }
+    
+    // Ensure directory exists
+    const configDir = dirname(configPath)
+    if (!existsSync(configDir)) {
+      mkdirSync(configDir, { recursive: true })
+    }
     
     writeFileSync(configPath, JSON.stringify(mergedConfig, null, 2))
     res.json({ success: true, config: mergedConfig })

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { ReviewSession, FileDiff, ReviewStatus, ReviewNote } from '@reviewflow/shared'
+import type { ReviewSession, ReviewStatus, ReviewNote } from '@reviewflow/shared'
 import { generateId } from '@reviewflow/shared'
 
 interface ReviewStore {
@@ -93,7 +93,7 @@ const mockSession: ReviewSession = {
           newStart: 1,
           newLines: 15,
           header: '@@ -0,0 +1,15 @@ import React from "react"',
-          reviewStatus: 'pending',
+          reviewStatus: 'unreviewed',
           lines: [
             { type: 'add', newLineNumber: 1, content: 'import React from "react"' },
             { type: 'add', newLineNumber: 2, content: 'import { DiffHunk } from "@reviewflow/shared"' },
@@ -148,7 +148,7 @@ const mockSession: ReviewSession = {
           newStart: 0,
           newLines: 0,
           header: '@@ -1,5 +0,0 @@ # Old README',
-          reviewStatus: 'noted',
+          reviewStatus: 'unreviewed',
           lines: [
             { type: 'delete', oldLineNumber: 1, content: '# Old README' },
             { type: 'delete', oldLineNumber: 2, content: '' },
@@ -316,10 +316,7 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
         }
       })
       
-      // Update hunk status to 'noted' if it was a memo
-      if (type === 'memo') {
-        await get().updateHunkStatus(hunkId, 'noted')
-      }
+      // Note: We no longer automatically change status when adding notes
     } catch (error) {
       console.error('Failed to add note:', error)
       // Fallback for network errors - create note locally
@@ -343,7 +340,7 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
       })
       
       if (type === 'memo') {
-        await get().updateHunkStatus(hunkId, 'noted')
+        // Note: We no longer automatically change status when adding notes
       }
     }
   },
