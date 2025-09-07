@@ -9,6 +9,7 @@
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
     "type-check": "pnpm -r type-check",
+    "ci": "pnpm build && pnpm type-check && pnpm lint && pnpm test",
     "install-cli": "pnpm build && cd packages/cli && npm link",
     "uninstall-cli": "cd packages/cli && npm unlink -g @reviewflow/cli"
   },
