@@ -86,12 +86,14 @@ export class ReviewService {
   }
 
   async getSession(sessionId: string): Promise<ReviewSession | null> {
-    const get = promisify(this.db.get.bind(this.db))
-    const all = promisify(this.db.all.bind(this.db))
-
-    const session = await get(`
-      SELECT * FROM review_sessions WHERE id = ?
-    `, sessionId) as any
+    const session = await new Promise<any>((resolve, reject) => {
+      this.db.get(`
+        SELECT * FROM review_sessions WHERE id = ?
+      `, sessionId, (err, row) => {
+        if (err) reject(err)
+        else resolve(row)
+      })
+    })
 
     if (!session) {
       return null
