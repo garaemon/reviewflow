@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronRight, Check, MessageSquare, StickyNote, User, FileText } from 'lucide-react'
+import { ChevronDown, ChevronRight, Check, MessageSquare, StickyNote } from 'lucide-react'
 import type { DiffHunk, DiffLine, ReviewStatus, ReviewNote } from '@reviewflow/shared'
 import { useSettingsStore } from '../store/settingsStore'
 
@@ -12,21 +12,22 @@ interface DiffViewerProps {
 
 interface DiffLineProps {
   line: DiffLine
-  lineIndex: number
   hunkId: string
   notes: ReviewNote[]
   onAddNote: (hunkId: string, lineNumber?: number) => void
 }
 
-function DiffLineComponent({ line, lineIndex, hunkId, notes, onAddNote }: DiffLineProps) {
+function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
+  const { darkMode, viewMode } = useSettingsStore()
+  
   const getLineClass = () => {
     switch (line.type) {
       case 'add':
-        return 'bg-green-900/30 border-green-700/50'
+        return darkMode ? 'bg-green-900/30 border-green-700/50' : 'bg-green-100 border-green-300'
       case 'delete':
-        return 'bg-red-900/30 border-red-700/50'
+        return darkMode ? 'bg-red-900/30 border-red-700/50' : 'bg-red-100 border-red-300'
       default:
-        return 'bg-gray-800/50 border-gray-700/50'
+        return darkMode ? 'bg-gray-800/50 border-gray-700/50' : 'bg-gray-50 border-gray-200'
     }
   }
 
@@ -45,26 +46,73 @@ function DiffLineComponent({ line, lineIndex, hunkId, notes, onAddNote }: DiffLi
   const lineNumber = line.newLineNumber || line.oldLineNumber
   const lineNotes = notes.filter(note => note.lineNumber === lineNumber)
 
+  // Split view rendering
+  if (viewMode === 'split') {
+    return (
+      <div className="flex">
+        {/* Old line (left side) */}
+        <div className={`flex-1 ${line.type === 'delete' ? getLineClass() : darkMode ? 'bg-gray-900' : 'bg-gray-50'} border-r ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}>
+          <div className="flex group hover:bg-gray-750">
+            <div className={`flex-none w-12 px-2 py-1 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right`}>
+              {line.type !== 'add' ? (line.oldLineNumber || '') : ''}
+            </div>
+            <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              {line.type === 'delete' ? '-' : ' '}
+            </div>
+            <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre`}>
+              {line.type !== 'add' ? line.content : ''}
+            </div>
+          </div>
+        </div>
+        
+        {/* New line (right side) */}
+        <div className={`flex-1 ${line.type === 'add' ? getLineClass() : darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+          <div className="flex group hover:bg-gray-750">
+            <div className={`flex-none w-12 px-2 py-1 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right`}>
+              {line.type !== 'delete' ? (line.newLineNumber || '') : ''}
+            </div>
+            <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              {line.type === 'add' ? '+' : ' '}
+            </div>
+            <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre`}>
+              {line.type !== 'delete' ? line.content : ''}
+            </div>
+            <div className="flex-none opacity-0 group-hover:opacity-100 px-2 py-1">
+              <button
+                onClick={() => onAddNote(hunkId, line.newLineNumber || line.oldLineNumber)}
+                className={`${darkMode ? 'text-gray-400 hover:text-blue-400' : 'text-gray-500 hover:text-blue-600'} transition-colors`}
+                title={`Add note to line ${line.newLineNumber || line.oldLineNumber}`}
+              >
+                <MessageSquare className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Unified view rendering (default)
   return (
     <div>
       {/* コード行 */}
-      <div className={`flex group hover:bg-gray-750 ${getLineClass()} border-l-2`}>
-        <div className="flex-none w-12 px-2 py-1 text-xs text-gray-500 text-right">
+      <div className={`flex group ${darkMode ? 'hover:bg-gray-750' : 'hover:bg-gray-100'} ${getLineClass()} border-l-2`}>
+        <div className={`flex-none w-12 px-2 py-1 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right`}>
           {line.oldLineNumber || ''}
         </div>
-        <div className="flex-none w-12 px-2 py-1 text-xs text-gray-500 text-right border-r border-gray-700">
+        <div className={`flex-none w-12 px-2 py-1 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right border-r ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}>
           {line.newLineNumber || ''}
         </div>
-        <div className="flex-none w-6 px-1 py-1 text-xs text-center font-mono text-gray-400">
+        <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
           {getLineSymbol()}
         </div>
-        <div className="flex-1 px-2 py-1 font-mono text-sm text-white whitespace-pre">
+        <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre`}>
           {line.content}
         </div>
         <div className="flex-none opacity-0 group-hover:opacity-100 px-2 py-1">
           <button
             onClick={() => onAddNote(hunkId, line.newLineNumber || line.oldLineNumber)}
-            className="text-gray-400 hover:text-blue-400 transition-colors"
+            className={`${darkMode ? 'text-gray-400 hover:text-blue-400' : 'text-gray-500 hover:text-blue-600'} transition-colors`}
             title={`Add note to line ${line.newLineNumber || line.oldLineNumber}`}
           >
             <MessageSquare className="w-4 h-4" />
@@ -121,6 +169,7 @@ interface HunkViewerProps {
 
 function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps) {
   const [isExpanded, setIsExpanded] = useState(true)
+  const { darkMode } = useSettingsStore()
 
   const toggleReviewStatus = () => {
     const newStatus: ReviewStatus = hunk.reviewStatus === 'reviewed' ? 'unreviewed' : 'reviewed'
@@ -130,13 +179,13 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
   const hunkNotes = notes.filter(note => !note.lineNumber)
 
   return (
-    <div className="border border-gray-700 rounded-lg mb-4 overflow-hidden">
+    <div className={`border ${darkMode ? 'border-gray-700' : 'border-gray-300'} rounded-lg mb-4 overflow-hidden`}>
       {/* Hunk Header */}
-      <div className="bg-gray-800 px-4 py-3">
+      <div className={`${darkMode ? 'bg-gray-800' : 'bg-gray-100'} px-4 py-3`}>
         <div className="flex items-center space-x-3 mb-2">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-gray-400 hover:text-white transition-colors"
+            className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
             title={isExpanded ? "Collapse this hunk" : "Expand this hunk"}
           >
             {isExpanded ? (
@@ -145,10 +194,10 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
               <ChevronRight className="w-4 h-4" />
             )}
           </button>
-          <code className="text-sm text-gray-300 font-mono">
+          <code className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'} font-mono`}>
             {hunk.header}
           </code>
-          <span className="text-xs text-gray-500">
+          <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
             {hunk.lines.length} lines
           </span>
 
@@ -170,7 +219,9 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
                 className={`px-2 py-1 rounded text-xs transition-colors ${
                   hunk.reviewStatus === 'reviewed'
                     ? 'bg-green-600 text-white hover:bg-green-700'
-                    : 'bg-gray-700 text-gray-300 hover:bg-green-600 hover:text-white'
+                    : darkMode
+                      ? 'bg-gray-700 text-gray-300 hover:bg-green-600 hover:text-white'
+                      : 'bg-gray-300 text-gray-700 hover:bg-green-600 hover:text-white'
                 }`}
                 title={hunk.reviewStatus === 'reviewed' ? "Mark as unreviewed" : "Mark as reviewed"}
               >
@@ -179,7 +230,11 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
               {/* Note Button */}
               <button
                 onClick={() => onAddNote(hunk.id)}
-                className="px-2 py-1 rounded text-xs bg-gray-700 text-gray-300 hover:bg-blue-600 hover:text-white transition-colors"
+                className={`px-2 py-1 rounded text-xs transition-colors ${
+                  darkMode
+                    ? 'bg-gray-700 text-gray-300 hover:bg-blue-600 hover:text-white'
+                    : 'bg-gray-300 text-gray-700 hover:bg-blue-600 hover:text-white'
+                }`}
                 title="Add a note to this hunk"
               >
                 📝
@@ -223,12 +278,11 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
 
       {/* Hunk Content */}
       {isExpanded && (
-        <div className="bg-gray-900">
+        <div className={`${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
           {hunk.lines.map((line, index) => (
             <DiffLineComponent
               key={index}
               line={line}
-              lineIndex={index}
               hunkId={hunk.id}
               notes={notes}
               onAddNote={onAddNote}
@@ -241,7 +295,7 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
 }
 
 export function DiffViewer({ hunks, notes, onStatusChange, onAddNote }: DiffViewerProps) {
-  const { viewMode, contextLines } = useSettingsStore()
+  const { viewMode, darkMode } = useSettingsStore()
 
   const reviewedCount = hunks.filter(h => h.reviewStatus === 'reviewed').length
   const totalCount = hunks.length
@@ -249,14 +303,20 @@ export function DiffViewer({ hunks, notes, onStatusChange, onAddNote }: DiffView
   return (
     <div className="space-y-4">
       {/* Progress Summary */}
-      <div className="bg-gray-800 rounded-lg p-4">
+      <div className={`${darkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-4`}>
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-medium text-white">Review Progress</h3>
-          <span className="text-sm text-gray-300">
-            {reviewedCount} / {totalCount} hunks reviewed
-          </span>
+          <h3 className={`text-lg font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Progress</h3>
+          <div className="flex items-center space-x-4">
+            <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              {reviewedCount} / {totalCount} hunks reviewed
+            </span>
+            {/* View Mode Indicator */}
+            <span className={`text-xs px-2 py-1 rounded ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'}`}>
+              {viewMode === 'split' ? 'Split View' : 'Unified View'}
+            </span>
+          </div>
         </div>
-        <div className="w-full bg-gray-700 rounded-full h-2">
+        <div className={`w-full ${darkMode ? 'bg-gray-700' : 'bg-gray-300'} rounded-full h-2`}>
           <div
             className="bg-green-600 h-2 rounded-full transition-all duration-300"
             style={{ width: `${totalCount > 0 ? (reviewedCount / totalCount) * 100 : 0}%` }}
@@ -266,7 +326,7 @@ export function DiffViewer({ hunks, notes, onStatusChange, onAddNote }: DiffView
 
       {/* Hunks */}
       {hunks.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
+        <div className={`text-center py-12 ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
           No changes to review
         </div>
       ) : (

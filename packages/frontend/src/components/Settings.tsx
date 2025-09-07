@@ -38,13 +38,13 @@ export function Settings() {
   }
 
   return (
-    <div className="bg-gray-800 rounded-lg p-6 max-w-2xl">
+    <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 max-w-2xl border ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-medium text-white">Review Settings</h2>
+        <h2 className={`text-lg font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Settings</h2>
         <div className="flex space-x-2">
           <button
             onClick={handleReset}
-            className="flex items-center px-3 py-2 text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors"
+            className={`flex items-center px-3 py-2 text-sm ${darkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'} rounded-md transition-colors`}
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Reset
@@ -52,7 +52,7 @@ export function Settings() {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="flex items-center px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white rounded-md transition-colors"
+            className={`flex items-center px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 ${darkMode ? 'disabled:bg-blue-800' : 'disabled:bg-blue-400'} text-white rounded-md transition-colors`}
           >
             <Save className="w-4 h-4 mr-2" />
             {isSaving ? 'Saving...' : 'Save'}
@@ -61,21 +61,21 @@ export function Settings() {
       </div>
 
       {saveStatus === 'success' && (
-        <div className="mb-4 p-3 bg-green-900/50 border border-green-700 rounded-md">
-          <p className="text-green-300 text-sm">Settings saved successfully!</p>
+        <div className={`mb-4 p-3 ${darkMode ? 'bg-green-900/50 border-green-700 text-green-300' : 'bg-green-100 border-green-300 text-green-700'} border rounded-md`}>
+          <p className="text-sm">Settings saved successfully!</p>
         </div>
       )}
 
       {saveStatus === 'error' && (
-        <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-md">
-          <p className="text-red-300 text-sm">Failed to save settings. Using local storage.</p>
+        <div className={`mb-4 p-3 ${darkMode ? 'bg-red-900/50 border-red-700 text-red-300' : 'bg-red-100 border-red-300 text-red-700'} border rounded-md`}>
+          <p className="text-sm">Failed to save settings. Using local storage.</p>
         </div>
       )}
 
       <div className="space-y-6">
         {/* Context Lines */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
             Context Lines
           </label>
           <div className="flex items-center space-x-4">
@@ -85,18 +85,18 @@ export function Settings() {
               max="10"
               value={contextLines}
               onChange={(e) => updateSetting('contextLines', parseInt(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className={`flex-1 h-2 ${darkMode ? 'bg-gray-700' : 'bg-gray-300'} rounded-lg appearance-none cursor-pointer slider`}
             />
-            <span className="text-gray-300 text-sm w-8">{contextLines}</span>
+            <span className={`${darkMode ? 'text-gray-300' : 'text-gray-700'} text-sm w-8`}>{contextLines}</span>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} mt-1`}>
             Number of context lines to show around changes
           </p>
         </div>
 
         {/* View Mode */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
             View Mode
           </label>
           <div className="flex space-x-4">
@@ -107,9 +107,9 @@ export function Settings() {
                 value="unified"
                 checked={viewMode === 'unified'}
                 onChange={(e) => updateSetting('viewMode', e.target.value as 'unified' | 'split')}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 bg-gray-700"
+                className={`h-4 w-4 text-blue-600 focus:ring-blue-500 ${darkMode ? 'border-gray-300 bg-gray-700' : 'border-gray-400 bg-white'}`}
               />
-              <span className="ml-2 text-sm text-gray-300">Unified</span>
+              <span className={`ml-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Unified</span>
             </label>
             <label className="flex items-center">
               <input
@@ -118,9 +118,9 @@ export function Settings() {
                 value="split"
                 checked={viewMode === 'split'}
                 onChange={(e) => updateSetting('viewMode', e.target.value as 'unified' | 'split')}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 bg-gray-700"
+                className={`h-4 w-4 text-blue-600 focus:ring-blue-500 ${darkMode ? 'border-gray-300 bg-gray-700' : 'border-gray-400 bg-white'}`}
               />
-              <span className="ml-2 text-sm text-gray-300">Side by Side</span>
+              <span className={`ml-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Side by Side</span>
             </label>
           </div>
         </div>
@@ -129,8 +129,8 @@ export function Settings() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <label className="flex flex-col">
-              <span className="text-sm font-medium text-gray-300">Dark Mode</span>
-              <span className="text-xs text-gray-500">Use dark theme</span>
+              <span className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Dark Mode</span>
+              <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>Use dark theme</span>
             </label>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -139,14 +139,14 @@ export function Settings() {
                 onChange={(e) => updateSetting('darkMode', e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className={`w-11 h-6 ${darkMode ? 'bg-gray-600' : 'bg-gray-300'} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}></div>
             </label>
           </div>
 
           <div className="flex items-center justify-between">
             <label className="flex flex-col">
-              <span className="text-sm font-medium text-gray-300">Show Whitespace</span>
-              <span className="text-xs text-gray-500">Display whitespace characters</span>
+              <span className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Show Whitespace</span>
+              <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>Display whitespace characters</span>
             </label>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -155,18 +155,18 @@ export function Settings() {
                 onChange={(e) => updateSetting('showWhitespace', e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className={`w-11 h-6 ${darkMode ? 'bg-gray-600' : 'bg-gray-300'} peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}></div>
             </label>
           </div>
         </div>
 
-        <div className="pt-4 border-t border-gray-700">
-          <h3 className="text-sm font-medium text-gray-300 mb-2">Keyboard Shortcuts</h3>
-          <div className="text-xs text-gray-500 space-y-1">
-            <div><kbd className="bg-gray-700 px-1 rounded">j/k</kbd> - Next/Previous hunk</div>
-            <div><kbd className="bg-gray-700 px-1 rounded">r</kbd> - Mark as reviewed</div>
-            <div><kbd className="bg-gray-700 px-1 rounded">n</kbd> - Add note</div>
-            <div><kbd className="bg-gray-700 px-1 rounded">c</kbd> - Add comment</div>
+        <div className={`pt-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}>
+          <h3 className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Keyboard Shortcuts</h3>
+          <div className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} space-y-1`}>
+            <div><kbd className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} px-1 rounded`}>j/k</kbd> - Next/Previous hunk</div>
+            <div><kbd className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} px-1 rounded`}>r</kbd> - Mark as reviewed</div>
+            <div><kbd className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} px-1 rounded`}>n</kbd> - Add note</div>
+            <div><kbd className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} px-1 rounded`}>c</kbd> - Add comment</div>
           </div>
         </div>
       </div>
