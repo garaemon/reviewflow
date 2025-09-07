@@ -66,7 +66,7 @@ export class ReviewService {
       this.db.run(`
         INSERT INTO review_sessions (id, repository_path, base_commit, target_commit, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?)
-      `, sessionId, repositoryPath, baseCommit, targetCommit, now, now, (err) => {
+      `, sessionId, repositoryPath, baseCommit, targetCommit, now, now, (err: any) => {
         if (err) reject(err)
         else resolve()
       })
