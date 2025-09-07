@@ -1,5 +1,4 @@
 import sqlite3 from 'sqlite3'
-import { promisify } from 'util'
 import type { ReviewSession, ReviewNote, ReviewStatus } from '@reviewflow/shared'
 import { generateId } from '@reviewflow/shared'
 import { GitService } from './GitService.js'
