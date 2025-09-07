@@ -74,8 +74,9 @@ ReviewFlow is built as a monorepo with the following packages:
 ## Development
 
 ### Prerequisites
-- Node.js 18+
-- pnpm 8+
+- Node.js 18+ or 20+
+- pnpm 8.14.0+
+- Git
 
 ### Setup
 ```bash
@@ -84,8 +85,12 @@ git clone <repository-url>
 cd reviewflow
 pnpm install
 
-# Start development servers
+# Start development servers (all packages in parallel)
 pnpm dev
+
+# Or start individual packages
+pnpm --filter @reviewflow/frontend dev
+pnpm --filter @reviewflow/backend dev
 ```
 
 ### Build
@@ -95,6 +100,20 @@ pnpm build
 
 # Build specific package
 pnpm --filter @reviewflow/frontend build
+```
+
+### Testing
+```bash
+# Run all tests (build, type-check, lint, test)
+pnpm ci-test
+
+# Individual commands
+pnpm type-check    # TypeScript type checking
+pnpm lint          # ESLint code linting
+pnpm test          # Unit tests
+
+# Test GitHub Actions workflow locally
+act
 ```
 
 ### Project Structure
@@ -132,13 +151,32 @@ Review data is stored locally in SQLite database at `.reviewflow/reviews.db`:
 - **Hunk Status**: Store review status for each code hunk
 - **Review Notes**: Store memos and comments
 
+## CI/CD
+
+This project uses GitHub Actions for continuous integration:
+
+- **Node.js Matrix**: Tests on Node.js 18.x and 20.x
+- **Automated Testing**: Runs build, type-check, lint, and test on every push/PR
+- **Branch Protection**: Tests must pass before merging to main
+
+### Local Testing
+Test the same workflow locally using [act](https://github.com/nektos/act):
+```bash
+# Install act (macOS)
+brew install act
+
+# Run GitHub Actions workflow locally
+act
+```
+
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
+2. Create a feature branch: `git checkout -b YYYY.MM.DD-feature-name`
 3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+4. Run tests: `pnpm ci-test`
+5. Ensure tests pass with `act`
+6. Submit a pull request
 
 ## License
 
