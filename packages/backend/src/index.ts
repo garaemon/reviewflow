@@ -14,7 +14,7 @@ app.use('/api/review', reviewRoutes)
 app.use('/api/git', gitRoutes)
 app.use('/api/settings', settingsRoutes)
 
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
