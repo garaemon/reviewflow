@@ -172,11 +172,15 @@ export class ReviewService {
     const noteId = generateId()
     const now = new Date().toISOString()
 
-    const run = promisify(this.db.run.bind(this.db))
-    await run(`
-      INSERT INTO review_notes (id, hunk_id, line_number, type, content, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, noteId, hunkId, lineNumber, type, content, now, now)
+    await new Promise<void>((resolve, reject) => {
+      this.db.run(`
+        INSERT INTO review_notes (id, hunk_id, line_number, type, content, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `, noteId, hunkId, lineNumber, type, content, now, now, (err) => {
+        if (err) reject(err)
+        else resolve()
+      })
+    })
 
     return {
       id: noteId,
