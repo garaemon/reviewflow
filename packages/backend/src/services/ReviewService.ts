@@ -88,7 +88,7 @@ export class ReviewService {
 
     const session = await get(`
       SELECT * FROM review_sessions WHERE id = ?
-    `, [sessionId]) as any
+    `, sessionId) as any
 
     if (!session) {
       return null
