@@ -102,9 +102,14 @@ export class ReviewService {
     const gitService = new GitService(session.repository_path)
     const files = await gitService.getDiff(session.base_commit, session.target_commit)
 
-    const hunkStatuses = await all(`
-      SELECT hunk_id, status FROM hunk_status WHERE session_id = ?
-    `, sessionId) as any[]
+    const hunkStatuses = await new Promise<any[]>((resolve, reject) => {
+      this.db.all(`
+        SELECT hunk_id, status FROM hunk_status WHERE session_id = ?
+      `, sessionId, (err, rows) => {
+        if (err) reject(err)
+        else resolve(rows || [])
+      })
+    })
 
     const statusMap = new Map(hunkStatuses.map(h => [h.hunk_id, h.status]))
 
