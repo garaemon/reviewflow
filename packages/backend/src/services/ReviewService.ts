@@ -145,7 +145,7 @@ export class ReviewService {
     await run(`
       INSERT OR REPLACE INTO hunk_status (hunk_id, session_id, status, updated_at)
       VALUES (?, (SELECT id FROM review_sessions LIMIT 1), ?, ?)
-    `, [hunkId, status, now])
+    `, hunkId, status, now)
   }
 
   async createNote(params: {
