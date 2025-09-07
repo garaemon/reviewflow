@@ -149,13 +149,17 @@ export class ReviewService {
   }
 
   async updateHunkStatus(hunkId: string, status: ReviewStatus): Promise<void> {
-    const run = promisify(this.db.run.bind(this.db))
     const now = new Date().toISOString()
 
-    await run(`
-      INSERT OR REPLACE INTO hunk_status (hunk_id, session_id, status, updated_at)
-      VALUES (?, (SELECT id FROM review_sessions LIMIT 1), ?, ?)
-    `, hunkId, status, now)
+    await new Promise<void>((resolve, reject) => {
+      this.db.run(`
+        INSERT OR REPLACE INTO hunk_status (hunk_id, session_id, status, updated_at)
+        VALUES (?, (SELECT id FROM review_sessions LIMIT 1), ?, ?)
+      `, hunkId, status, now, (err) => {
+        if (err) reject(err)
+        else resolve()
+      })
+    })
   }
 
   async createNote(params: {
