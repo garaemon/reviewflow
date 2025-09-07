@@ -54,9 +54,9 @@ export class GitService {
           oldLines: hunk.oldLines,
           newStart: hunk.newStart,
           newLines: hunk.newLines,
-          header: hunk.header || '',
+          header: `@@ -${hunk.oldStart},${hunk.oldLines} +${hunk.newStart},${hunk.newLines} @@`,
           lines,
-          reviewStatus: 'pending'
+          reviewStatus: 'unreviewed'
         })
       }
 
