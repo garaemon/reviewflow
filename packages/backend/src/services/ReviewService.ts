@@ -158,7 +158,7 @@ export class ReviewService {
       this.db.run(`
         INSERT OR REPLACE INTO hunk_status (hunk_id, session_id, status, updated_at)
         VALUES (?, (SELECT id FROM review_sessions LIMIT 1), ?, ?)
-      `, hunkId, status, now, (err) => {
+      `, hunkId, status, now, (err: any) => {
         if (err) reject(err)
         else resolve()
       })
