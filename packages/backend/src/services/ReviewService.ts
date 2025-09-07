@@ -99,7 +99,7 @@ export class ReviewService {
 
     const hunkStatuses = await all(`
       SELECT hunk_id, status FROM hunk_status WHERE session_id = ?
-    `, [sessionId]) as any[]
+    `, sessionId) as any[]
 
     const statusMap = new Map(hunkStatuses.map(h => [h.hunk_id, h.status]))
 
