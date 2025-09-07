@@ -131,11 +131,14 @@ export class ReviewService {
   }
 
   async getAllSessions(): Promise<ReviewSession[]> {
-    const all = promisify(this.db.all.bind(this.db))
-    
-    const sessions = await all(`
-      SELECT * FROM review_sessions ORDER BY updated_at DESC
-    `) as any[]
+    const sessions = await new Promise<any[]>((resolve, reject) => {
+      this.db.all(`
+        SELECT * FROM review_sessions ORDER BY updated_at DESC
+      `, (err: any, rows: any[]) => {
+        if (err) reject(err)
+        else resolve(rows || [])
+      })
+    })
 
     return sessions.map(session => ({
       id: session.id,
