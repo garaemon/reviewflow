@@ -162,7 +162,7 @@ export class ReviewService {
     await run(`
       INSERT INTO review_notes (id, hunk_id, line_number, type, content, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [noteId, hunkId, lineNumber, type, content, now, now])
+    `, noteId, hunkId, lineNumber, type, content, now, now)
 
     return {
       id: noteId,
