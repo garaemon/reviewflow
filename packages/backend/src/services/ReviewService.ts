@@ -67,7 +67,7 @@ export class ReviewService {
     await run(`
       INSERT INTO review_sessions (id, repository_path, base_commit, target_commit, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?)
-    `, [sessionId, repositoryPath, baseCommit, targetCommit, now, now])
+    `, sessionId, repositoryPath, baseCommit, targetCommit, now, now)
 
     const session: ReviewSession = {
       id: sessionId,
