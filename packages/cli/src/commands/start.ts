@@ -1,13 +1,7 @@
-import { spawn } from 'child_process'
-import { join, dirname } from 'path'
+import { join } from 'path'
 import { existsSync } from 'fs'
-import { fileURLToPath } from 'url'
 import chalk from 'chalk'
-import ora from 'ora'
 import open from 'open'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
 
 interface StartOptions {
   range: string
