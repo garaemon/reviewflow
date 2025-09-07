@@ -179,7 +179,7 @@ export class ReviewService {
       this.db.run(`
         INSERT INTO review_notes (id, hunk_id, line_number, type, content, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?)
-      `, noteId, hunkId, lineNumber, type, content, now, now, (err) => {
+      `, noteId, hunkId, lineNumber, type, content, now, now, (err: any) => {
         if (err) reject(err)
         else resolve()
       })
