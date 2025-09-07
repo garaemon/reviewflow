@@ -62,11 +62,15 @@ export class ReviewService {
     const gitService = new GitService(repositoryPath)
     const files = await gitService.getDiff(baseCommit, targetCommit)
 
-    const run = promisify(this.db.run.bind(this.db))
-    await run(`
-      INSERT INTO review_sessions (id, repository_path, base_commit, target_commit, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `, sessionId, repositoryPath, baseCommit, targetCommit, now, now)
+    await new Promise<void>((resolve, reject) => {
+      this.db.run(`
+        INSERT INTO review_sessions (id, repository_path, base_commit, target_commit, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `, sessionId, repositoryPath, baseCommit, targetCommit, now, now, (err) => {
+        if (err) reject(err)
+        else resolve()
+      })
+    })
 
     const session: ReviewSession = {
       id: sessionId,
