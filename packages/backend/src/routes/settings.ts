@@ -17,7 +17,7 @@ const getDefaultConfig = (): ReviewConfig => ({
   viewMode: 'unified'
 })
 
-router.get('/', (req, res) => {
+router.get('/', (_req, res) => {
   try {
     const configPath = getConfigPath()
     

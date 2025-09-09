@@ -1,5 +1,4 @@
 import sqlite3 from 'sqlite3'
-import { promisify } from 'util'
 import type { ReviewSession, ReviewNote, ReviewStatus } from '@reviewflow/shared'
 import { generateId } from '@reviewflow/shared'
 import { GitService } from './GitService.js'
@@ -63,11 +62,15 @@ export class ReviewService {
     const gitService = new GitService(repositoryPath)
     const files = await gitService.getDiff(baseCommit, targetCommit)
 
-    const run = promisify(this.db.run.bind(this.db))
-    await run(`
-      INSERT INTO review_sessions (id, repository_path, base_commit, target_commit, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `, [sessionId, repositoryPath, baseCommit, targetCommit, now, now])
+    await new Promise<void>((resolve, reject) => {
+      this.db.run(`
+        INSERT INTO review_sessions (id, repository_path, base_commit, target_commit, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `, sessionId, repositoryPath, baseCommit, targetCommit, now, now, (err: any) => {
+        if (err) reject(err)
+        else resolve()
+      })
+    })
 
     const session: ReviewSession = {
       id: sessionId,
@@ -83,12 +86,14 @@ export class ReviewService {
   }
 
   async getSession(sessionId: string): Promise<ReviewSession | null> {
-    const get = promisify(this.db.get.bind(this.db))
-    const all = promisify(this.db.all.bind(this.db))
-
-    const session = await get(`
-      SELECT * FROM review_sessions WHERE id = ?
-    `, [sessionId]) as any
+    const session = await new Promise<any>((resolve, reject) => {
+      this.db.get(`
+        SELECT * FROM review_sessions WHERE id = ?
+      `, sessionId, (err, row) => {
+        if (err) reject(err)
+        else resolve(row)
+      })
+    })
 
     if (!session) {
       return null
@@ -97,9 +102,14 @@ export class ReviewService {
     const gitService = new GitService(session.repository_path)
     const files = await gitService.getDiff(session.base_commit, session.target_commit)
 
-    const hunkStatuses = await all(`
-      SELECT hunk_id, status FROM hunk_status WHERE session_id = ?
-    `, [sessionId]) as any[]
+    const hunkStatuses = await new Promise<any[]>((resolve, reject) => {
+      this.db.all(`
+        SELECT hunk_id, status FROM hunk_status WHERE session_id = ?
+      `, sessionId, (err, rows) => {
+        if (err) reject(err)
+        else resolve(rows || [])
+      })
+    })
 
     const statusMap = new Map(hunkStatuses.map(h => [h.hunk_id, h.status]))
 
@@ -121,11 +131,14 @@ export class ReviewService {
   }
 
   async getAllSessions(): Promise<ReviewSession[]> {
-    const all = promisify(this.db.all.bind(this.db))
-    
-    const sessions = await all(`
-      SELECT * FROM review_sessions ORDER BY updated_at DESC
-    `) as any[]
+    const sessions = await new Promise<any[]>((resolve, reject) => {
+      this.db.all(`
+        SELECT * FROM review_sessions ORDER BY updated_at DESC
+      `, (err: any, rows: any[]) => {
+        if (err) reject(err)
+        else resolve(rows || [])
+      })
+    })
 
     return sessions.map(session => ({
       id: session.id,
@@ -139,13 +152,17 @@ export class ReviewService {
   }
 
   async updateHunkStatus(hunkId: string, status: ReviewStatus): Promise<void> {
-    const run = promisify(this.db.run.bind(this.db))
     const now = new Date().toISOString()
 
-    await run(`
-      INSERT OR REPLACE INTO hunk_status (hunk_id, session_id, status, updated_at)
-      VALUES (?, (SELECT id FROM review_sessions LIMIT 1), ?, ?)
-    `, [hunkId, status, now])
+    await new Promise<void>((resolve, reject) => {
+      this.db.run(`
+        INSERT OR REPLACE INTO hunk_status (hunk_id, session_id, status, updated_at)
+        VALUES (?, (SELECT id FROM review_sessions LIMIT 1), ?, ?)
+      `, hunkId, status, now, (err: any) => {
+        if (err) reject(err)
+        else resolve()
+      })
+    })
   }
 
   async createNote(params: {
@@ -158,11 +175,15 @@ export class ReviewService {
     const noteId = generateId()
     const now = new Date().toISOString()
 
-    const run = promisify(this.db.run.bind(this.db))
-    await run(`
-      INSERT INTO review_notes (id, hunk_id, line_number, type, content, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [noteId, hunkId, lineNumber, type, content, now, now])
+    await new Promise<void>((resolve, reject) => {
+      this.db.run(`
+        INSERT INTO review_notes (id, hunk_id, line_number, type, content, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `, noteId, hunkId, lineNumber, type, content, now, now, (err: any) => {
+        if (err) reject(err)
+        else resolve()
+      })
+    })
 
     return {
       id: noteId,

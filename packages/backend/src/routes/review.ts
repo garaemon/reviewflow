@@ -3,7 +3,7 @@ import { ReviewService } from '../services/ReviewService.js'
 
 const router = Router()
 
-router.get('/sessions', async (req, res) => {
+router.get('/sessions', async (_req, res) => {
   try {
     const reviewService = new ReviewService()
     const sessions = await reviewService.getAllSessions()
