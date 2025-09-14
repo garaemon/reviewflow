@@ -80,7 +80,7 @@ export async function startCommand(options: StartOptions) {
       throw new Error(`Failed to create session: ${response.statusText}`)
     }
     
-    const session = await response.json()
+    const session = await response.json() as any
     console.log(chalk.green('✓ Review session created'))
     console.log(chalk.gray('Session ID:'), session.id)
     
