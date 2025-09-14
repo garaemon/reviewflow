@@ -47,3 +47,7 @@ coverage/
 # Review flow data
 .reviewflow/
 *.review-state
+
+.claude/settings.local.json
+.playwright-mcp/
+.serena/
