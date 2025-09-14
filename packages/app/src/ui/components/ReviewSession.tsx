@@ -3,7 +3,7 @@ import { RefreshCw, GitCommit, Clock, CheckCircle, AlertCircle } from 'lucide-re
 import { useReviewStore } from '../store/reviewStore'
 import { useSettingsStore } from '../store/settingsStore'
 import { FileViewer } from './FileViewer'
-import type { ReviewStatus } from '@reviewflow/shared'
+import type { ReviewStatus } from '@shared'
 
 interface NoteModalProps {
   isOpen: boolean
@@ -175,11 +175,11 @@ export function ReviewSession() {
     )
   }
 
-  const totalHunks = currentSession.files.reduce((sum, file) => sum + file.hunks.length, 0)
-  const reviewedHunks = currentSession.files.reduce((sum, file) => 
-    sum + file.hunks.filter(hunk => hunk.reviewStatus === 'reviewed').length, 0)
-  const unreviewedHunks = currentSession.files.reduce((sum, file) => 
-    sum + file.hunks.filter(hunk => hunk.reviewStatus === 'unreviewed').length, 0)
+  const totalHunks = currentSession.files.reduce((sum: number, file: any) => sum + file.hunks.length, 0)
+  const reviewedHunks = currentSession.files.reduce((sum: number, file: any) => 
+    sum + file.hunks.filter((hunk: any) => hunk.reviewStatus === 'reviewed').length, 0)
+  const unreviewedHunks = currentSession.files.reduce((sum: number, file: any) => 
+    sum + file.hunks.filter((hunk: any) => hunk.reviewStatus === 'unreviewed').length, 0)
 
   return (
     <div className="space-y-6">
@@ -248,7 +248,7 @@ export function ReviewSession() {
       </div>
 
       {/* File List */}
-      {currentSession.files.map((file) => (
+      {currentSession.files.map((file: any) => (
         <FileViewer
           key={file.path}
           file={file}

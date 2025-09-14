@@ -1,6 +1,6 @@
 import { create } from 'zustand'
-import type { ReviewSession, ReviewStatus, ReviewNote } from '@reviewflow/shared'
-import { generateId } from '@reviewflow/shared'
+import type { ReviewSession, ReviewStatus, ReviewNote } from '@shared'
+import { generateId } from '@shared'
 
 interface ReviewStore {
   currentSession: ReviewSession | null
@@ -97,7 +97,7 @@ const mockSession: ReviewSession = {
           reviewStatus: 'unreviewed',
           lines: [
             { type: 'add', newLineNumber: 1, content: 'import React from "react"' },
-            { type: 'add', newLineNumber: 2, content: 'import { DiffHunk } from "@reviewflow/shared"' },
+            { type: 'add', newLineNumber: 2, content: 'import { DiffHunk } from "@shared"' },
             { type: 'add', newLineNumber: 3, content: '' },
             { type: 'add', newLineNumber: 4, content: 'export function DiffViewer() {' },
             { type: 'add', newLineNumber: 5, content: '  return (' },
@@ -210,12 +210,9 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
         return
       }
       
-      // Load the latest session (first in the array, ordered by creation time descending)
-      const latestSessionSummary = sessions[0]
-      console.log('Loading latest session:', latestSessionSummary.id, 'from', latestSessionSummary.repositoryPath)
-      
-      // Load the full session data with files
-      await get().loadSession(latestSessionSummary.id)
+      // Load the latest session (assuming they are ordered by creation time)
+      const latestSession = sessions[sessions.length - 1]
+      set({ currentSession: latestSession, loading: false })
     } catch (error) {
       console.error('Failed to load latest session:', error)
       // Fallback to mock session on error
@@ -269,9 +266,9 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
       })
 
       // Always update local state (works for both successful API calls and fallback)
-      const updatedFiles = currentSession.files.map(file => ({
+      const updatedFiles = currentSession.files.map((file: any) => ({
         ...file,
-        hunks: file.hunks.map(hunk => 
+        hunks: file.hunks.map((hunk: any) => 
           hunk.id === hunkId ? { ...hunk, reviewStatus: status } : hunk
         )
       }))
@@ -291,9 +288,9 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
       console.error('Failed to update hunk status:', error)
       
       // Fallback: Update local state even if API fails
-      const updatedFiles = currentSession.files.map(file => ({
+      const updatedFiles = currentSession.files.map((file: any) => ({
         ...file,
-        hunks: file.hunks.map(hunk => 
+        hunks: file.hunks.map((hunk: any) => 
           hunk.id === hunkId ? { ...hunk, reviewStatus: status } : hunk
         )
       }))
