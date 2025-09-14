@@ -59,7 +59,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
             <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
               {line.type === 'delete' ? '-' : ' '}
             </div>
-            <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre`}>
+            <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre-wrap break-all overflow-hidden`}>
               {line.type !== 'add' ? line.content : ''}
             </div>
           </div>
@@ -74,7 +74,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
             <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
               {line.type === 'add' ? '+' : ' '}
             </div>
-            <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre`}>
+            <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre-wrap break-all overflow-hidden`}>
               {line.type !== 'delete' ? line.content : ''}
             </div>
             <div className="flex-none opacity-0 group-hover:opacity-100 px-2 py-1">
@@ -106,7 +106,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
         <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
           {getLineSymbol()}
         </div>
-        <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre`}>
+        <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre-wrap break-all overflow-hidden`}>
           {line.content}
         </div>
         <div className="flex-none opacity-0 group-hover:opacity-100 px-2 py-1">
