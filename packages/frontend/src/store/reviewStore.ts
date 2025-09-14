@@ -12,6 +12,7 @@ interface ReviewStore {
   loadSession: (sessionId: string) => Promise<void>
   loadLatestSession: () => Promise<void>
   createSession: (repositoryPath: string, baseCommit?: string, targetCommit?: string) => Promise<void>
+  updateRange: (newRange: string) => Promise<void>
   updateHunkStatus: (hunkId: string, status: ReviewStatus) => Promise<void>
   addNote: (hunkId: string, content: string, type: 'memo' | 'comment', lineNumber?: number) => Promise<void>
   
@@ -253,6 +254,21 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
         loading: false 
       })
     }
+  },
+
+  updateRange: async (newRange: string) => {
+    const { currentSession } = get()
+    if (!currentSession) {
+      throw new Error('No active session to update')
+    }
+
+    // Parse the range
+    const [baseCommit, targetCommit] = newRange.includes('..')
+      ? newRange.split('..')
+      : ['HEAD~1', 'HEAD']
+
+    // Create a new session with the updated range
+    await get().createSession(currentSession.repositoryPath, baseCommit, targetCommit)
   },
 
   updateHunkStatus: async (hunkId: string, status: ReviewStatus) => {

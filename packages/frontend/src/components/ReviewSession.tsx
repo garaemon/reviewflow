@@ -3,6 +3,7 @@ import { RefreshCw, GitCommit, Clock, CheckCircle, AlertCircle } from 'lucide-re
 import { useReviewStore } from '../store/reviewStore'
 import { useSettingsStore } from '../store/settingsStore'
 import { FileViewer } from './FileViewer'
+import { RangeSelector } from './RangeSelector'
 import type { ReviewStatus } from '@reviewflow/shared'
 
 interface NoteModalProps {
@@ -112,6 +113,7 @@ export function ReviewSession() {
     notes,
     updateHunkStatus, 
     addNote,
+    updateRange,
     loadLatestSession 
   } = useReviewStore()
   const { darkMode } = useSettingsStore()
@@ -202,11 +204,13 @@ export function ReviewSession() {
               {currentSession.repositoryPath}
             </div>
           </div>
-          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-3`}>
-            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-xs uppercase`}>Range</div>
-            <div className={`font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              {currentSession.baseCommit}..{currentSession.targetCommit}
-            </div>
+          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-3 group`}>
+            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-xs uppercase mb-2`}>Range</div>
+            <RangeSelector
+              currentRange={`${currentSession.baseCommit}..${currentSession.targetCommit}`}
+              onRangeChange={updateRange}
+              disabled={loading}
+            />
           </div>
           <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-3`}>
             <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-xs uppercase`}>Files Changed</div>
