@@ -112,7 +112,7 @@ export function ReviewSession() {
     notes,
     updateHunkStatus, 
     addNote,
-    loadMockSession 
+    loadLatestSession 
   } = useReviewStore()
   const { darkMode } = useSettingsStore()
   
@@ -123,9 +123,9 @@ export function ReviewSession() {
   }>({ isOpen: false, hunkId: '' })
 
   useEffect(() => {
-    // Load mock session for development
-    loadMockSession()
-  }, [loadMockSession])
+    // Load latest session or fall back to mock session
+    loadLatestSession()
+  }, [loadLatestSession])
 
   const handleStatusChange = async (hunkId: string, status: ReviewStatus) => {
     await updateHunkStatus(hunkId, status)

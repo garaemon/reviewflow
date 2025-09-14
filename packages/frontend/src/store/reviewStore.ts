@@ -10,6 +10,7 @@ interface ReviewStore {
   
   // Actions
   loadSession: (sessionId: string) => Promise<void>
+  loadLatestSession: () => Promise<void>
   createSession: (repositoryPath: string, baseCommit?: string, targetCommit?: string) => Promise<void>
   updateHunkStatus: (hunkId: string, status: ReviewStatus) => Promise<void>
   addNote: (hunkId: string, content: string, type: 'memo' | 'comment', lineNumber?: number) => Promise<void>
@@ -186,6 +187,40 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
         error: error instanceof Error ? error.message : 'Failed to load session',
         loading: false 
       })
+    }
+  },
+
+  loadLatestSession: async () => {
+    set({ loading: true, error: null })
+    
+    try {
+      // First try to get all sessions and load the latest one
+      const response = await fetch('/api/review/sessions')
+      
+      if (!response.ok) {
+        throw new Error(`Failed to load sessions: ${response.statusText}`)
+      }
+      
+      const sessions: ReviewSession[] = await response.json()
+      
+      if (sessions.length === 0) {
+        // No sessions available, fall back to mock session
+        console.log('No sessions found, loading mock session')
+        set({ currentSession: mockSession, loading: false, error: null, notes: mockNotes })
+        return
+      }
+      
+      // Load the latest session (first in the array, ordered by creation time descending)
+      const latestSessionSummary = sessions[0]
+      console.log('Loading latest session:', latestSessionSummary.id, 'from', latestSessionSummary.repositoryPath)
+      
+      // Load the full session data with files
+      await get().loadSession(latestSessionSummary.id)
+    } catch (error) {
+      console.error('Failed to load latest session:', error)
+      // Fallback to mock session on error
+      console.log('API error, falling back to mock session')
+      set({ currentSession: mockSession, loading: false, error: null, notes: mockNotes })
     }
   },
 

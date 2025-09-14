@@ -1,7 +1,20 @@
 import { Router } from 'express'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 import { ReviewService } from '../services/ReviewService.js'
 
 const router = Router()
+
+router.get('/current-session', async (_req, res) => {
+  try {
+    // Try to read current-session.json from .reviewflow directory
+    const sessionInfoPath = join(process.cwd(), '.reviewflow/current-session.json')
+    const sessionInfo = JSON.parse(readFileSync(sessionInfoPath, 'utf-8'))
+    res.json(sessionInfo)
+  } catch (error) {
+    res.status(404).json({ error: 'No current session found' })
+  }
+})
 
 router.get('/sessions', async (_req, res) => {
   try {
