@@ -49,45 +49,84 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
   // Split view rendering
   if (viewMode === 'split') {
     return (
-      <div className="flex">
-        {/* Old line (left side) */}
-        <div className={`flex-1 ${line.type === 'delete' ? getLineClass() : darkMode ? 'bg-gray-900' : 'bg-gray-50'} border-r ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}>
-          <div className={`flex group ${darkMode ? 'hover:bg-gray-750' : 'hover:bg-blue-50'}`}>
-            <div className={`flex-none w-6 px-1 py-0.25 text-3xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right`}>
-              {line.type !== 'add' ? (line.oldLineNumber || '') : ''}
+      <div>
+        <div className="flex">
+          {/* Old line (left side) */}
+          <div className={`flex-1 ${line.type === 'delete' ? getLineClass() : darkMode ? 'bg-gray-900' : 'bg-gray-50'} border-r ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}>
+            <div className={`flex group ${darkMode ? 'hover:bg-gray-750' : 'hover:bg-blue-50'}`}>
+              <div className={`flex-none w-6 px-1 py-0.25 text-3xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right`}>
+                {line.type !== 'add' ? (line.oldLineNumber || '') : ''}
+              </div>
+              <div className={`flex-none w-4 px-0.5 py-0.25 text-3xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                {line.type === 'delete' ? '-' : ' '}
+              </div>
+              <div className={`flex-1 px-1 py-0.25 font-mono text-2xs leading-extra-tight ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre-wrap break-all overflow-hidden`}>
+                {line.type !== 'add' ? line.content : ''}
+              </div>
             </div>
-            <div className={`flex-none w-4 px-0.5 py-0.25 text-3xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {line.type === 'delete' ? '-' : ' '}
-            </div>
-            <div className={`flex-1 px-1 py-0.25 font-mono text-2xs leading-extra-tight ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre-wrap break-all overflow-hidden`}>
-              {line.type !== 'add' ? line.content : ''}
+          </div>
+
+          {/* New line (right side) */}
+          <div className={`flex-1 ${line.type === 'add' ? getLineClass() : darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+            <div className={`flex group ${darkMode ? 'hover:bg-gray-750' : 'hover:bg-blue-50'}`}>
+              <div className={`flex-none w-6 px-1 py-0.25 text-3xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right`}>
+                {line.type !== 'delete' ? (line.newLineNumber || '') : ''}
+              </div>
+              <div className={`flex-none w-4 px-0.5 py-0.25 text-3xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                {line.type === 'add' ? '+' : ' '}
+              </div>
+              <div className={`flex-1 px-1 py-0.25 font-mono text-2xs leading-extra-tight ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre-wrap break-all overflow-hidden`}>
+                {line.type !== 'delete' ? line.content : ''}
+              </div>
+              <div className="flex-none opacity-0 group-hover:opacity-100 px-1 py-0.25">
+                <button
+                  onClick={() => onAddNote(hunkId, line.newLineNumber || line.oldLineNumber)}
+                  className={`${darkMode ? 'text-gray-400 hover:text-blue-400' : 'text-gray-500 hover:text-blue-600'} transition-colors`}
+                  title={`Add note to line ${line.newLineNumber || line.oldLineNumber}`}
+                >
+                  <MessageSquare className="w-3 h-3" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
-        
-        {/* New line (right side) */}
-        <div className={`flex-1 ${line.type === 'add' ? getLineClass() : darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-          <div className={`flex group ${darkMode ? 'hover:bg-gray-750' : 'hover:bg-blue-50'}`}>
-            <div className={`flex-none w-6 px-1 py-0.25 text-3xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right`}>
-              {line.type !== 'delete' ? (line.newLineNumber || '') : ''}
-            </div>
-            <div className={`flex-none w-4 px-0.5 py-0.25 text-3xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {line.type === 'add' ? '+' : ' '}
-            </div>
-            <div className={`flex-1 px-1 py-0.25 font-mono text-2xs leading-extra-tight ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre-wrap break-all overflow-hidden`}>
-              {line.type !== 'delete' ? line.content : ''}
-            </div>
-            <div className="flex-none opacity-0 group-hover:opacity-100 px-1 py-0.25">
-              <button
-                onClick={() => onAddNote(hunkId, line.newLineNumber || line.oldLineNumber)}
-                className={`${darkMode ? 'text-gray-400 hover:text-blue-400' : 'text-gray-500 hover:text-blue-600'} transition-colors`}
-                title={`Add note to line ${line.newLineNumber || line.oldLineNumber}`}
-              >
-                <MessageSquare className="w-3 h-3" />
-              </button>
+
+        {/* Inline comments for split view */}
+        {lineNotes.map((note) => (
+          <div
+            key={note.id}
+            className="border-l-2 border-gray-600 ml-4"
+          >
+            <div className={`mx-4 my-1 p-2 rounded border ${
+              note.type === 'memo'
+                ? 'bg-blue-900/30 border-blue-700/50'
+                : 'bg-yellow-900/30 border-yellow-700/50'
+            }`}>
+              <div className="flex items-start">
+                <div className="flex-none mr-2 mt-0.5">
+                  {note.type === 'memo' ? (
+                    <StickyNote className="w-3 h-3 text-blue-400" />
+                  ) : (
+                    <MessageSquare className="w-3 h-3 text-yellow-400" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-3xs text-gray-400">
+                      {note.type === 'memo' ? 'Personal memo' : 'Review comment'}
+                    </span>
+                    <span className="text-3xs text-gray-500">
+                      {new Date(note.createdAt).toLocaleTimeString()}
+                    </span>
+                  </div>
+                  <p className="text-2xs text-gray-200 whitespace-pre-wrap">
+                    {note.content}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        ))}
       </div>
     )
   }
@@ -95,7 +134,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
   // Unified view rendering (default)
   return (
     <div>
-      {/* コード行 */}
+      {/* Code line */}
       <div className={`flex group ${darkMode ? 'hover:bg-gray-750' : 'hover:bg-blue-50'} ${getLineClass()} border-l-2`}>
         <div className={`flex-none w-6 px-1 py-0.25 text-3xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right`}>
           {line.oldLineNumber || ''}
@@ -120,7 +159,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
         </div>
       </div>
       
-      {/* インラインコメント */}
+      {/* Inline comments */}
       {lineNotes.map((note) => (
         <div
           key={note.id}
