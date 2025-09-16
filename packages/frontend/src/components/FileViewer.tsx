@@ -74,16 +74,30 @@ export function FileViewer({ file, notes, onStatusChange, onAddNote }: FileViewe
 
             <div className="flex flex-col">
               <div className="flex items-center space-x-2">
-                <span className={`font-mono text-sm ${getStatusColor(file.status, darkMode)}`}>
+                <span className={`font-mono text-2xs ${getStatusColor(file.status, darkMode)}`}>
                   {file.path}
                 </span>
-                <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} capitalize`}>
+                <span className={`text-3xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} capitalize`}>
                   ({file.status})
                 </span>
+                {/* Review Progress inline */}
+                <div className="flex items-center space-x-1">
+                  <div className={`text-3xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {reviewedHunks}/{totalHunks}
+                  </div>
+                  <div className={`w-12 ${darkMode ? 'bg-gray-700' : 'bg-gray-300'} rounded-full h-1`}>
+                    <div
+                      className="bg-green-600 h-1 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${totalHunks > 0 ? (reviewedHunks / totalHunks) * 100 : 0}%`
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
-              
+
               {file.oldPath && file.oldPath !== file.path && (
-                <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} font-mono`}>
+                <span className={`text-3xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} font-mono`}>
                   {file.oldPath} → {file.path}
                 </span>
               )}
@@ -92,27 +106,12 @@ export function FileViewer({ file, notes, onStatusChange, onAddNote }: FileViewe
 
           <div className="flex items-center space-x-4 text-sm">
             {/* File Stats */}
-            <div className="flex items-center space-x-3 text-xs">
+            <div className="flex items-center space-x-3 text-3xs">
               <span className="text-green-500">+{addedLines}</span>
               <span className="text-red-500">-{deletedLines}</span>
               <span className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 {totalHunks} {totalHunks === 1 ? 'hunk' : 'hunks'}
               </span>
-            </div>
-
-            {/* Review Progress */}
-            <div className="flex items-center space-x-2">
-              <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                {reviewedHunks}/{totalHunks} reviewed
-              </div>
-              <div className={`w-12 ${darkMode ? 'bg-gray-700' : 'bg-gray-300'} rounded-full h-1`}>
-                <div
-                  className="bg-green-600 h-1 rounded-full transition-all duration-300"
-                  style={{ 
-                    width: `${totalHunks > 0 ? (reviewedHunks / totalHunks) * 100 : 0}%` 
-                  }}
-                />
-              </div>
             </div>
           </div>
         </div>

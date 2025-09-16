@@ -188,63 +188,63 @@ export function ReviewSession() {
       {/* Session Header */}
       <div className={`${darkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-6`}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Code Review Session</h2>
-          <div className={`flex items-center space-x-4 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+          <h2 className={`text-base font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Code Review Session</h2>
+          <div className={`flex items-center space-x-4 text-2xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             <div className="flex items-center">
-              <Clock className="w-4 h-4 mr-1" aria-label="Last updated" />
+              <Clock className="w-3 h-3 mr-1" aria-label="Last updated" />
               {new Date(currentSession.updatedAt).toLocaleString()}
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-3`}>
-            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-xs uppercase`}>Repository</div>
-            <div className={`font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} truncate`}>
+          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-2`}>
+            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-3xs uppercase`}>Repository</div>
+            <div className={`font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} truncate`}>
               {currentSession.repositoryPath}
             </div>
           </div>
-          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-3 group`}>
-            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-xs uppercase mb-2`}>Range</div>
+          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-2 group`}>
+            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-3xs uppercase mb-1`}>Range</div>
             <RangeSelector
               currentRange={`${currentSession.baseCommit}..${currentSession.targetCommit}`}
               onRangeChange={updateRange}
               disabled={loading}
             />
           </div>
-          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-3`}>
-            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-xs uppercase`}>Files Changed</div>
-            <div className={`text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-2`}>
+            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-3xs uppercase`}>Files Changed</div>
+            <div className={`text-2xs ${darkMode ? 'text-white' : 'text-gray-900'}`}>
               {currentSession.files.length} files
             </div>
           </div>
         </div>
 
         {/* Progress Overview */}
-        <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded-lg p-4`}>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Progress</h3>
-            <div className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              {reviewedHunks} / {totalHunks} hunks reviewed
+        <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded-lg p-3`}>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className={`text-2xs font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Progress</h3>
+            <div className={`text-3xs ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              {reviewedHunks} / {totalHunks} hunks
             </div>
           </div>
-          
-          <div className="flex items-center space-x-4 mb-2">
-            <div className="flex items-center text-sm">
-              <CheckCircle className="w-4 h-4 text-green-500 mr-1" aria-label="Reviewed and approved hunks" />
-              <span className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{reviewedHunks} reviewed</span>
+
+          <div className="flex items-center space-x-3 mb-1">
+            <div className="flex items-center text-3xs">
+              <CheckCircle className="w-3 h-3 text-green-500 mr-0.5" aria-label="Reviewed and approved hunks" />
+              <span className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{reviewedHunks}</span>
             </div>
-            <div className="flex items-center text-sm">
-              <Clock className={`w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-600'} mr-1`} aria-label="Hunks awaiting review" />
-              <span className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{unreviewedHunks} unreviewed</span>
+            <div className="flex items-center text-3xs">
+              <Clock className={`w-3 h-3 ${darkMode ? 'text-gray-500' : 'text-gray-600'} mr-0.5`} aria-label="Hunks awaiting review" />
+              <span className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{unreviewedHunks}</span>
             </div>
           </div>
-          
-          <div className={`w-full ${darkMode ? 'bg-gray-600' : 'bg-gray-300'} rounded-full h-2`}>
+
+          <div className={`w-full ${darkMode ? 'bg-gray-600' : 'bg-gray-300'} rounded-full h-1`}>
             <div
-              className="bg-green-500 h-2 rounded-full transition-all duration-500"
-              style={{ 
-                width: `${totalHunks > 0 ? (reviewedHunks / totalHunks) * 100 : 0}%` 
+              className="bg-green-500 h-1 rounded-full transition-all duration-500"
+              style={{
+                width: `${totalHunks > 0 ? (reviewedHunks / totalHunks) * 100 : 0}%`
               }}
             />
           </div>
