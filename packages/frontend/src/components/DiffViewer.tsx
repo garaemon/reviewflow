@@ -91,7 +91,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
           </div>
         </div>
 
-        {/* インラインコメント（split view用） */}
+        {/* Inline comments for split view */}
         {lineNotes.map((note) => (
           <div
             key={note.id}
@@ -134,7 +134,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
   // Unified view rendering (default)
   return (
     <div>
-      {/* コード行 */}
+      {/* Code line */}
       <div className={`flex group ${darkMode ? 'hover:bg-gray-750' : 'hover:bg-blue-50'} ${getLineClass()} border-l-2`}>
         <div className={`flex-none w-6 px-1 py-0.25 text-3xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right`}>
           {line.oldLineNumber || ''}
@@ -159,7 +159,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
         </div>
       </div>
       
-      {/* インラインコメント */}
+      {/* Inline comments */}
       {lineNotes.map((note) => (
         <div
           key={note.id}
