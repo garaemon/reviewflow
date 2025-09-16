@@ -295,10 +295,7 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
 }
 
 export function DiffViewer({ hunks, notes, onStatusChange, onAddNote }: DiffViewerProps) {
-  const { viewMode, darkMode } = useSettingsStore()
-
-  const reviewedCount = hunks.filter(h => h.reviewStatus === 'reviewed').length
-  const totalCount = hunks.length
+  const { darkMode } = useSettingsStore()
 
   return (
     <div className="space-y-2">
