@@ -16,7 +16,7 @@ app.use(cors())
 app.use(express.json())
 
 // Static file serving
-app.use(express.static(resolve(__dirname, '../public')))
+app.use(express.static(resolve(__dirname, '../../dist/public')))
 
 // API routes
 app.use('/api/review', reviewRoutes)
@@ -29,7 +29,7 @@ app.get('/api/health', (_req, res) => {
 
 // SPA fallback - serve index.html for non-API routes
 app.get('*', (_req, res) => {
-  res.sendFile(resolve(__dirname, '../public/index.html'))
+  res.sendFile(resolve(__dirname, '../../dist/public/index.html'))
 })
 
 if (process.env.NODE_ENV !== 'test') {

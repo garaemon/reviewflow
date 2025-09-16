@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { RefreshCw, GitCommit, Clock, CheckCircle, AlertCircle } from 'lucide-react'
+import { RefreshCw, GitCommit, Clock, CheckCircle, AlertCircle, GitBranch } from 'lucide-react'
 import { useReviewStore } from '../store/reviewStore'
 import { useSettingsStore } from '../store/settingsStore'
 import { FileViewer } from './FileViewer'
+import { CommitGraph } from './CommitGraph'
 import type { ReviewStatus } from '@shared'
 
 interface NoteModalProps {
@@ -105,22 +106,29 @@ function NoteModal({ isOpen, onClose, onSave, lineNumber }: NoteModalProps) {
 }
 
 export function ReviewSession() {
-  const { 
-    currentSession, 
-    loading, 
+  const {
+    currentSession,
+    loading,
     error,
     notes,
-    updateHunkStatus, 
+    updateHunkStatus,
     addNote,
-    loadLatestSession 
+    loadLatestSession,
+    createSession
   } = useReviewStore()
   const { darkMode } = useSettingsStore()
-  
+
   const [noteModal, setNoteModal] = useState<{
     isOpen: boolean
     hunkId: string
     lineNumber?: number
   }>({ isOpen: false, hunkId: '' })
+
+  const [showCommitGraph, setShowCommitGraph] = useState(false)
+  const [selectedCommits, setSelectedCommits] = useState<{
+    base?: string
+    target?: string
+  }>({})
 
   useEffect(() => {
     // Load latest session or fall back to mock session
@@ -138,6 +146,19 @@ export function ReviewSession() {
   const handleSaveNote = async (content: string, type: 'memo' | 'comment') => {
     await addNote(noteModal.hunkId, content, type, noteModal.lineNumber)
     setNoteModal({ isOpen: false, hunkId: '' })
+  }
+
+  const handleCommitSelection = async (baseCommit: string, targetCommit: string) => {
+    setSelectedCommits({ base: baseCommit, target: targetCommit })
+    setShowCommitGraph(false)
+
+    if (currentSession?.repositoryPath) {
+      await createSession(currentSession.repositoryPath, baseCommit, targetCommit)
+    }
+  }
+
+  const toggleCommitGraph = () => {
+    setShowCommitGraph(!showCommitGraph)
   }
 
   if (loading) {
@@ -187,8 +208,21 @@ export function ReviewSession() {
       <div className={`${darkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-6`}>
         <div className="flex items-center justify-between mb-4">
           <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Code Review Session</h2>
-          <div className={`flex items-center space-x-4 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            <div className="flex items-center">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={toggleCommitGraph}
+              className={`flex items-center px-3 py-2 rounded text-sm ${
+                showCommitGraph
+                  ? 'bg-blue-600 text-white'
+                  : darkMode
+                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+              }`}
+            >
+              <GitBranch className="w-4 h-4 mr-2" />
+              {showCommitGraph ? 'Hide Graph' : 'Select Commits'}
+            </button>
+            <div className={`flex items-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               <Clock className="w-4 h-4 mr-1" aria-label="Last updated" />
               {new Date(currentSession.updatedAt).toLocaleString()}
             </div>
@@ -204,8 +238,8 @@ export function ReviewSession() {
           </div>
           <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-3`}>
             <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-xs uppercase`}>Range</div>
-            <div className={`font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              {currentSession.baseCommit}..{currentSession.targetCommit}
+            <div className={`font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} truncate`} title={`${currentSession.baseCommit}..${currentSession.targetCommit}`}>
+              {currentSession.baseCommit.substring(0, 7)}..{currentSession.targetCommit.substring(0, 7)}
             </div>
           </div>
           <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-3`}>
@@ -246,6 +280,15 @@ export function ReviewSession() {
           </div>
         </div>
       </div>
+
+      {/* Commit Graph */}
+      {showCommitGraph && currentSession && (
+        <CommitGraph
+          repositoryPath={currentSession.repositoryPath}
+          onCommitSelect={handleCommitSelection}
+          selectedCommits={selectedCommits}
+        />
+      )}
 
       {/* File List */}
       {currentSession.files.map((file: any) => (

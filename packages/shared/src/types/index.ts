@@ -52,3 +52,25 @@ export interface ReviewConfig {
   darkMode: boolean
   viewMode: 'unified' | 'split'
 }
+
+export interface GitCommit {
+  hash: string
+  shortHash: string
+  author: string
+  date: string
+  message: string
+  subject: string
+  refs?: string
+  parentHashes: string[]
+}
+
+export interface GitBranch {
+  name: string
+  current: boolean
+  remote?: string
+}
+
+export interface CommitGraph {
+  commits: GitCommit[]
+  branches: GitBranch[]
+}

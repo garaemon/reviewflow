@@ -1,13 +1,17 @@
 import simpleGit, { SimpleGit } from 'simple-git'
 import { parsePatch } from 'diff'
-import type { FileDiff, DiffHunk, DiffLine } from '@shared/types/index.js'
+import type { FileDiff, DiffHunk, DiffLine, GitCommit, GitBranch, CommitGraph } from '@shared/types/index.js'
 import { generateId } from '@shared/utils/index.js'
 
 export class GitService {
   private git: SimpleGit
 
   constructor(repositoryPath: string) {
-    this.git = simpleGit(repositoryPath)
+    // For development, use current working directory if path is a placeholder
+    const actualPath = repositoryPath === '/path/to/repo'
+      ? process.cwd()
+      : repositoryPath
+    this.git = simpleGit(actualPath)
   }
 
   async getDiff(baseCommit: string, targetCommit: string): Promise<FileDiff[]> {
@@ -24,6 +28,45 @@ export class GitService {
       behind: status.behind,
       files: status.files
     }
+  }
+
+  async getCommitGraph(maxCount: number = 50): Promise<CommitGraph> {
+    const [commits, branches] = await Promise.all([
+      this.getCommitHistory(maxCount),
+      this.getBranches()
+    ])
+
+    return {
+      commits,
+      branches
+    }
+  }
+
+  async getCommitHistory(maxCount: number = 50): Promise<GitCommit[]> {
+    const log = await this.git.log({
+      maxCount
+    })
+
+    return log.all.map(commit => ({
+      hash: commit.hash,
+      shortHash: commit.hash.substring(0, 7),
+      author: commit.author_name,
+      date: commit.date,
+      message: commit.message,
+      subject: commit.message.split('\n')[0],
+      refs: commit.refs || undefined,
+      parentHashes: []
+    }))
+  }
+
+  async getBranches(): Promise<GitBranch[]> {
+    const branches = await this.git.branch(['-a'])
+
+    return Object.entries(branches.branches).map(([name, branch]) => ({
+      name: name.replace(/^remotes\//, ''),
+      current: branch.current,
+      remote: name.startsWith('remotes/') ? name.split('/')[1] : undefined
+    }))
   }
 
   private parseDiffText(diffText: string): FileDiff[] {
