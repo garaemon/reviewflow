@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { RefreshCw, GitBranch as GitBranchIcon, GitCommit as GitCommitIcon, Calendar, User, Check } from 'lucide-react'
 import type { GitCommit, GitBranch, CommitGraph } from '@shared'
 import { useSettingsStore } from '../store/settingsStore'
@@ -17,7 +17,7 @@ export function CommitGraph({ repositoryPath, onCommitSelect, selectedCommits }:
   const [selectedTarget, setSelectedTarget] = useState<string | null>(selectedCommits?.target || null)
   const { darkMode } = useSettingsStore()
 
-  const loadCommitGraph = async () => {
+  const loadCommitGraph = useCallback(async () => {
     if (!repositoryPath) return
 
     setLoading(true)
@@ -38,11 +38,11 @@ export function CommitGraph({ repositoryPath, onCommitSelect, selectedCommits }:
     } finally {
       setLoading(false)
     }
-  }
+  }, [repositoryPath])
 
   useEffect(() => {
     loadCommitGraph()
-  }, [repositoryPath])
+  }, [loadCommitGraph])
 
   const handleCommitClick = (commit: GitCommit) => {
     if (!selectedBase) {
