@@ -3,14 +3,24 @@ import type { ReviewSession, ReviewNote, ReviewStatus } from '@reviewflow/shared
 import { generateId } from '@reviewflow/shared'
 import { GitService } from './GitService.js'
 import { join } from 'path'
+import { homedir } from 'os'
+import { existsSync, mkdirSync } from 'fs'
 
 export class ReviewService {
   private db: sqlite3.Database
 
   constructor(dbPath?: string) {
-    const path = dbPath || join(process.cwd(), '.reviewflow', 'reviews.db')
+    const path = dbPath || this.getDefaultDatabasePath()
     this.db = new sqlite3.Database(path)
     this.initializeDatabase()
+  }
+
+  private getDefaultDatabasePath(): string {
+    const cacheDir = join(homedir(), '.cache', 'reviewflow')
+    if (!existsSync(cacheDir)) {
+      mkdirSync(cacheDir, { recursive: true })
+    }
+    return join(cacheDir, 'reviews.db')
   }
 
   private initializeDatabase() {
