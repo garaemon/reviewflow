@@ -7,6 +7,7 @@ A powerful local code review tool that enhances GitHub's review capabilities wit
 - **Hunk-based Review Management**: Mark each code hunk as reviewed, pending, or noted
 - **Memo vs Comment Separation**: Separate personal memos from review comments
 - **Interactive Diff Range Selection**: Choose exactly which commits and files to review
+- **Commit Graph Visualization**: Visual commit history and branch relationships
 - **Modern Web UI**: Clean, responsive interface with dark mode support
 - **Local First**: Runs entirely on your machine for privacy and speed
 - **CLI Integration**: Simple `review` command to start sessions
@@ -78,8 +79,9 @@ Shows current configuration and project status.
 
 ReviewFlow is built as a monorepo with the following packages:
 
-- **`@reviewflow/frontend`**: React + TypeScript web UI
-- **`@reviewflow/backend`**: Node.js + Express API server
+- **`@reviewflow/app`**: All-in-one application with integrated frontend and backend
+- **`@reviewflow/frontend`**: Standalone React + TypeScript web UI
+- **`@reviewflow/backend`**: Standalone Node.js + Express API server
 - **`@reviewflow/cli`**: Command-line interface
 - **`@reviewflow/shared`**: Shared types and utilities
 
@@ -132,8 +134,9 @@ act
 ```
 reviewflow/
 ├── packages/
-│   ├── frontend/     # React web UI
-│   ├── backend/      # Express API server
+│   ├── app/          # All-in-one application
+│   ├── frontend/     # Standalone React web UI
+│   ├── backend/      # Standalone Express API server
 │   ├── cli/          # CLI application
 │   └── shared/       # Shared types & utilities
 ├── package.json      # Root package configuration
