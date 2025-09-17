@@ -36,23 +36,12 @@ A powerful local code review tool that enhances GitHub's review capabilities wit
    ```
    Then restart your shell and try the link command again.
 
-4. **Initialize ReviewFlow in your project**:
-   ```bash
-   review init
-   ```
-
-5. **Start a review session**:
+4. **Start a review session**:
    ```bash
    review start
    ```
 
 ## Usage
-
-### Initialize a Project
-```bash
-review init
-```
-Creates a `.reviewflow` directory with configuration and database.
 
 ### Start Review Session
 ```bash
@@ -145,7 +134,7 @@ reviewflow/
 
 ## Configuration
 
-ReviewFlow stores configuration in `.reviewflow/config.json`:
+ReviewFlow stores global configuration in `~/.config/review/config.json`:
 
 ```json
 {
@@ -158,13 +147,17 @@ ReviewFlow stores configuration in `.reviewflow/config.json`:
 }
 ```
 
+The configuration is created automatically with default values when you first run `review start`.
+
 ## Data Storage
 
-Review data is stored locally in SQLite database at `.reviewflow/reviews.db`:
+Review data is stored locally in your cache directory:
 
-- **Review Sessions**: Track different review sessions
-- **Hunk Status**: Store review status for each code hunk
-- **Review Notes**: Store memos and comments
+- **Database**: `~/.cache/reviewflow/reviews.db` - SQLite database for review sessions, hunk status, and notes
+- **Sessions**: `~/.cache/reviewflow/sessions/` - Session data and temporary files
+- **Cache**: Other cached data for improved performance
+
+All data is stored locally on your machine for privacy and speed.
 
 ## CI/CD
 

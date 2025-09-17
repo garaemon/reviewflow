@@ -3,7 +3,6 @@
 import { Command } from 'commander'
 import chalk from 'chalk'
 import { startCommand } from './commands/start.js'
-import { initCommand } from './commands/init.js'
 import { statusCommand } from './commands/status.js'
 
 const program = new Command()
@@ -12,11 +11,6 @@ program
   .name('review')
   .description('ReviewFlow - Code review support tool')
   .version('0.1.0')
-
-program
-  .command('init')
-  .description('Initialize ReviewFlow in current directory')
-  .action(initCommand)
 
 program
   .command('start')
@@ -37,7 +31,6 @@ if (program.args.length === 0) {
   console.log(chalk.blue('ReviewFlow - Code review support tool'))
   console.log()
   console.log(chalk.yellow('Usage:'))
-  console.log('  review init      Initialize ReviewFlow in current directory')
   console.log('  review start     Start a review session')
   console.log('  review status    Show current review status')
   console.log()
