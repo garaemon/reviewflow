@@ -27,19 +27,41 @@ router.post('/diff', async (req, res) => {
 router.get('/status/:repositoryPath(*)', async (req, res) => {
   try {
     const repositoryPath = req.params.repositoryPath
-    
+
     if (!repositoryPath) {
       return res.status(400).json({ error: 'Repository path is required' })
     }
 
     const gitService = new GitService(repositoryPath)
     const status = await gitService.getStatus()
-    
+
     res.json(status)
   } catch (error) {
     console.error('Error getting git status:', error)
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to get git status',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
+})
+
+router.get('/commits/:repositoryPath(*)', async (req, res) => {
+  try {
+    const repositoryPath = req.params.repositoryPath
+    const maxCount = parseInt(req.query.maxCount as string) || 50
+
+    if (!repositoryPath) {
+      return res.status(400).json({ error: 'Repository path is required' })
+    }
+
+    const gitService = new GitService(repositoryPath)
+    const commitGraph = await gitService.getCommitGraph(maxCount)
+
+    res.json(commitGraph)
+  } catch (error) {
+    console.error('Error getting commit graph:', error)
+    res.status(500).json({
+      error: 'Failed to get commit graph',
       message: error instanceof Error ? error.message : 'Unknown error'
     })
   }

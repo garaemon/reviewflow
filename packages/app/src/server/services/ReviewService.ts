@@ -2,13 +2,21 @@ import sqlite3 from 'sqlite3'
 import type { ReviewSession, ReviewNote, ReviewStatus } from '@shared/types/index.js'
 import { generateId } from '@shared/utils/index.js'
 import { GitService } from './GitService.js'
-import { join } from 'path'
+import { join, dirname } from 'path'
+import { mkdirSync, existsSync } from 'fs'
 
 export class ReviewService {
   private db: sqlite3.Database
 
   constructor(dbPath?: string) {
     const path = dbPath || join(process.cwd(), '.reviewflow', 'reviews.db')
+
+    // Create directory if it doesn't exist
+    const dir = dirname(path)
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true })
+    }
+
     this.db = new sqlite3.Database(path)
     this.initializeDatabase()
   }
