@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 
 // Mock fetch globally for tests
-global.fetch = async (url: string | URL | Request, init?: RequestInit) => {
+global.fetch = async (url: string | URL | Request) => {
   console.log('API error, falling back to mock session')
 
   // Return appropriate mock responses based on URL
