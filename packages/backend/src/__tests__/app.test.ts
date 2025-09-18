@@ -36,20 +36,23 @@ describe('Express App', () => {
 
   describe('API routes', () => {
     it('should respond to review routes', async () => {
-      // Test that review route exists (even if it returns 404 for non-existent data)
+      // Test that review route exists
       await request(app)
-        .get('/api/review/test')
+        .get('/api/review/current-session')
         .expect((res) => {
-          // Should not be 404 for the entire route, just the resource
-          expect(res.status).not.toBe(404)
+          // Should return 404 for missing session, not route not found
+          expect(res.status).toBe(404)
+          expect(res.body.error).toBe('No current session found')
         })
     })
 
     it('should respond to git routes', async () => {
       await request(app)
-        .get('/api/git/status')
+        .get('/api/git/status/test-repo')
         .expect((res) => {
-          expect(res.status).not.toBe(404)
+          // Should return 500 for invalid repo, not route not found
+          expect(res.status).toBe(500)
+          expect(res.body.message).toContain('directory that does not exist')
         })
     })
 

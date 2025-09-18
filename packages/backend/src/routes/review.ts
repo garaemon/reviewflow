@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { ReviewService } from '../services/ReviewService.js'
+import { ReviewService } from '../services/ReviewService'
 
 const router = Router()
 

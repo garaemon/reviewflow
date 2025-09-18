@@ -1,7 +1,7 @@
 import sqlite3 from 'sqlite3'
 import type { ReviewSession, ReviewNote, ReviewStatus } from '@reviewflow/shared'
 import { generateId } from '@reviewflow/shared'
-import { GitService } from './GitService.js'
+import { GitService } from './GitService'
 import { join } from 'path'
 import { homedir } from 'os'
 import { existsSync, mkdirSync } from 'fs'
