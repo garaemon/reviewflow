@@ -3,6 +3,7 @@ import { existsSync } from 'fs'
 import { spawn } from 'child_process'
 import chalk from 'chalk'
 import open from 'open'
+import { getSessionDir } from '../utils/config.js'
 
 interface StartOptions {
   range: string
@@ -12,13 +13,7 @@ interface StartOptions {
 
 export async function startCommand(options: StartOptions) {
   const cwd = process.cwd()
-  const reviewflowDir = join(cwd, '.reviewflow')
-
-  if (!existsSync(reviewflowDir)) {
-    console.log(chalk.red('ReviewFlow not initialized in this directory'))
-    console.log(chalk.gray('Run "review init" first'))
-    process.exit(1)
-  }
+  const sessionDir = getSessionDir()
 
   console.log(chalk.blue('🚀 Starting ReviewFlow...'))
   console.log()
@@ -85,7 +80,7 @@ export async function startCommand(options: StartOptions) {
     console.log(chalk.gray('Session ID:'), session.id)
     
     // Store the current session ID for the frontend to use
-    const sessionInfoPath = join(reviewflowDir, 'current-session.json')
+    const sessionInfoPath = join(sessionDir, 'current-session.json')
     const fs = await import('fs')
     await fs.promises.writeFile(sessionInfoPath, JSON.stringify({
       sessionId: session.id,
