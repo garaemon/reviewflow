@@ -63,7 +63,7 @@ describe('Settings Component', () => {
 
     expect(screen.getByText('Keyboard Shortcuts')).toBeInTheDocument()
     expect(screen.getByText('j/k')).toBeInTheDocument()
-    expect(screen.getByText('Next/Previous hunk')).toBeInTheDocument()
+    expect(screen.getByText('- Next/Previous hunk')).toBeInTheDocument()
   })
 
   it('renders save and reset buttons', () => {
