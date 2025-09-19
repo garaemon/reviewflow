@@ -19,6 +19,37 @@ export class GitService {
     return this.parseDiffText(diffText)
   }
 
+  async getUncommittedDiff(): Promise<FileDiff[]> {
+    // Get diff for staged changes (index vs HEAD)
+    const stagedDiffText = await this.git.diff(['--staged', '--unified=3'])
+    // Get diff for unstaged changes (working tree vs index)
+    const unstagedDiffText = await this.git.diff(['--unified=3'])
+
+    const stagedDiffs = this.parseDiffText(stagedDiffText, 'staged')
+    const unstagedDiffs = this.parseDiffText(unstagedDiffText, 'unstaged')
+
+    // Merge diffs for the same file
+    const allDiffs = new Map<string, FileDiff>()
+
+    // Add staged diffs first
+    for (const diff of stagedDiffs) {
+      allDiffs.set(diff.path, diff)
+    }
+
+    // Add or merge unstaged diffs
+    for (const diff of unstagedDiffs) {
+      const existing = allDiffs.get(diff.path)
+      if (existing) {
+        // Merge hunks from both staged and unstaged
+        existing.hunks.push(...diff.hunks)
+      } else {
+        allDiffs.set(diff.path, diff)
+      }
+    }
+
+    return Array.from(allDiffs.values())
+  }
+
   async getStatus() {
     const status = await this.git.status()
     return {
@@ -69,7 +100,7 @@ export class GitService {
     }))
   }
 
-  private parseDiffText(diffText: string): FileDiff[] {
+  private parseDiffText(diffText: string, diffType?: 'staged' | 'unstaged'): FileDiff[] {
     const patches = parsePatch(diffText)
     const fileDiffs: FileDiff[] = []
 
@@ -99,7 +130,8 @@ export class GitService {
           newLines: hunk.newLines,
           header: `@@ -${hunk.oldStart},${hunk.oldLines} +${hunk.newStart},${hunk.newLines} @@`,
           lines,
-          reviewStatus: 'unreviewed'
+          reviewStatus: 'unreviewed',
+          diffType
         })
       }
 

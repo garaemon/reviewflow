@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronRight, File, FileText, Plus, Minus, GitBranch } from 'lucide-react'
-import type { FileDiff, ReviewStatus, ReviewNote } from '@shared'
+import type { FileDiff, ReviewStatus, ReviewNote } from '@reviewflow/shared'
 import { DiffViewer } from './DiffViewer'
 import { useSettingsStore } from '../store/settingsStore'
 

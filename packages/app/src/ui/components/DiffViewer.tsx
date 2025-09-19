@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronRight, Check, MessageSquare, StickyNote } from 'lucide-react'
-import type { DiffHunk, DiffLine, ReviewStatus, ReviewNote } from '@shared'
+import type { DiffHunk, DiffLine, ReviewStatus, ReviewNote } from '@reviewflow/shared'
 import { useSettingsStore } from '../store/settingsStore'
 
 interface DiffViewerProps {
@@ -200,6 +200,17 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
           <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
             {hunk.lines.length} lines
           </span>
+
+          {/* Diff Type Badge */}
+          {hunk.diffType && (
+            <span className={`text-xs px-2 py-1 rounded-full ${
+              hunk.diffType === 'staged'
+                ? 'bg-green-800 text-green-200'
+                : 'bg-orange-800 text-orange-200'
+            }`}>
+              {hunk.diffType}
+            </span>
+          )}
 
           {/* Review Status and Actions */}
           <div className="flex-1 flex items-center justify-end space-x-2">
