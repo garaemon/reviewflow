@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { GitService } from '../services/GitService.js'
+import { GitService } from '../services/GitService'
 
 const router = Router()
 

@@ -1,8 +1,8 @@
 import express from 'express'
 import cors from 'cors'
-import { reviewRoutes } from './routes/review.js'
-import { gitRoutes } from './routes/git.js'
-import { settingsRoutes } from './routes/settings.js'
+import { reviewRoutes } from './routes/review'
+import { gitRoutes } from './routes/git'
+import { settingsRoutes } from './routes/settings'
 
 const app = express()
 const PORT = process.env.PORT || 3001
