@@ -51,6 +51,7 @@ jobs:
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+        slug: garaemon/reviewflow
         fail_ci_if_error: true
         files: packages/frontend/coverage/lcov.info,packages/backend/coverage/lcov.info
         flags: unittests
