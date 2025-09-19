@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { join, dirname } from 'path'
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
-import type { ReviewConfig } from '@shared/types/index.js'
+import type { ReviewConfig } from '@reviewflow/shared'
 
 const router = Router()
 

@@ -1,7 +1,7 @@
 import simpleGit, { SimpleGit } from 'simple-git'
 import { parsePatch } from 'diff'
-import type { FileDiff, DiffHunk, DiffLine, GitCommit, GitBranch, CommitGraph } from '@shared/types/index.js'
-import { generateId } from '@shared/utils/index.js'
+import type { FileDiff, DiffHunk, DiffLine, GitCommit, GitBranch, CommitGraph } from '@reviewflow/shared'
+import { generateId } from '@reviewflow/shared'
 
 export class GitService {
   private git: SimpleGit
