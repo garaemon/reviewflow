@@ -213,6 +213,11 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
   const toggleReviewStatus = () => {
     const newStatus: ReviewStatus = hunk.reviewStatus === 'reviewed' ? 'unreviewed' : 'reviewed'
     onStatusChange(hunk.id, newStatus)
+
+    // Auto-close chunk when marked as reviewed
+    if (newStatus === 'reviewed') {
+      setIsExpanded(false)
+    }
   }
 
   const hunkNotes = notes.filter(note => !note.lineNumber)
