@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { RefreshCw, GitCommit, Clock, CheckCircle, AlertCircle, GitBranch, FileEdit } from 'lucide-react'
+import { RefreshCw, GitCommit, Clock, CheckCircle, AlertCircle, GitBranch } from 'lucide-react'
 import { useReviewStore } from '../store/reviewStore'
 import { useSettingsStore } from '../store/settingsStore'
 import { FileViewer } from './FileViewer'
@@ -217,20 +217,6 @@ export function ReviewSession() {
         <div className="flex items-center justify-between mb-4">
           <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Code Review Session</h2>
           <div className="flex items-center space-x-4">
-            <button
-              onClick={handleLoadUncommittedChanges}
-              className={`flex items-center px-3 py-2 rounded text-sm ${
-                currentSession?.baseCommit === 'working-tree'
-                  ? 'bg-orange-600 text-white'
-                  : darkMode
-                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-              }`}
-              title="View uncommitted changes in working tree"
-            >
-              <FileEdit className="w-4 h-4 mr-2" />
-              {currentSession?.baseCommit === 'working-tree' ? 'Uncommitted' : 'Show Uncommitted'}
-            </button>
             <button
               onClick={toggleCommitGraph}
               className={`flex items-center px-3 py-2 rounded text-sm ${
