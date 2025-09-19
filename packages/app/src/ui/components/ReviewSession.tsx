@@ -165,6 +165,7 @@ export function ReviewSession() {
   const handleLoadUncommittedChanges = async () => {
     if (currentSession?.repositoryPath) {
       await loadUncommittedChanges(currentSession.repositoryPath)
+      setShowCommitGraph(false)
     }
   }
 
@@ -307,6 +308,7 @@ export function ReviewSession() {
         <CommitGraph
           repositoryPath={currentSession.repositoryPath}
           onCommitSelect={handleCommitSelection}
+          onUncommittedSelect={handleLoadUncommittedChanges}
           selectedCommits={selectedCommits}
         />
       )}
