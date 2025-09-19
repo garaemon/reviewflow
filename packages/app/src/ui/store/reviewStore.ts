@@ -1,20 +1,21 @@
 import { create } from 'zustand'
-import type { ReviewSession, ReviewStatus, ReviewNote } from '@shared'
-import { generateId } from '@shared'
+import type { ReviewSession, ReviewStatus, ReviewNote } from '@reviewflow/shared'
+import { generateId } from '@reviewflow/shared'
 
 interface ReviewStore {
   currentSession: ReviewSession | null
   loading: boolean
   error: string | null
   notes: Record<string, ReviewNote[]>
-  
+
   // Actions
   loadSession: (sessionId: string) => Promise<void>
   loadLatestSession: () => Promise<void>
   createSession: (repositoryPath: string, baseCommit?: string, targetCommit?: string) => Promise<void>
+  loadUncommittedChanges: (repositoryPath: string) => Promise<void>
   updateHunkStatus: (hunkId: string, status: ReviewStatus) => Promise<void>
   addNote: (hunkId: string, content: string, type: 'memo' | 'comment', lineNumber?: number) => Promise<void>
-  
+
   // Mock data for development
   loadMockSession: () => void
 }
@@ -223,7 +224,7 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
 
   createSession: async (repositoryPath: string, baseCommit = 'HEAD~1', targetCommit = 'HEAD') => {
     set({ loading: true, error: null })
-    
+
     try {
       const response = await fetch('/api/review/sessions', {
         method: 'POST',
@@ -236,18 +237,57 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
           targetCommit
         })
       })
-      
+
       if (!response.ok) {
         throw new Error(`Failed to create session: ${response.statusText}`)
       }
-      
+
       const session: ReviewSession = await response.json()
       set({ currentSession: session, loading: false })
     } catch (error) {
       console.error('Failed to create session:', error)
-      set({ 
+      set({
         error: error instanceof Error ? error.message : 'Failed to create session',
-        loading: false 
+        loading: false
+      })
+    }
+  },
+
+  loadUncommittedChanges: async (repositoryPath: string) => {
+    set({ loading: true, error: null })
+
+    try {
+      const response = await fetch('/api/git/uncommitted-diff', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ repositoryPath })
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to get uncommitted changes: ${response.statusText}`)
+      }
+
+      const files = await response.json()
+
+      // Create a pseudo session for uncommitted changes
+      const session: ReviewSession = {
+        id: generateId(),
+        repositoryPath,
+        baseCommit: 'working-tree',
+        targetCommit: 'uncommitted',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        files
+      }
+
+      set({ currentSession: session, loading: false })
+    } catch (error) {
+      console.error('Failed to load uncommitted changes:', error)
+      set({
+        error: error instanceof Error ? error.message : 'Failed to load uncommitted changes',
+        loading: false
       })
     }
   },

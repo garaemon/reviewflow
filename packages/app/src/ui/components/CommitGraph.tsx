@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { RefreshCw, GitBranch as GitBranchIcon, GitCommit as GitCommitIcon, Calendar, User, Check } from 'lucide-react'
-import type { GitCommit, GitBranch, CommitGraph } from '@shared'
+import type { GitCommit, GitBranch, CommitGraph } from '@reviewflow/shared'
 import { useSettingsStore } from '../store/settingsStore'
 
 interface CommitGraphProps {
