@@ -1,0 +1,36 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 80%
+        threshold: 1%
+    patch:
+      default:
+        target: 80%
+        threshold: 1%
+
+codecov:
+  require_ci_to_pass: yes
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+
+ignore:
+  - "tests/**/*"
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/node_modules/**"
+  - "*.config.*"
+  - "playwright.config.ts"
+
+flag_management:
+  default_rules:
+    statuses:
+      - type: project
+        target: 80%
+      - type: patch
+        target: 80%

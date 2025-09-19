@@ -7,6 +7,7 @@
     "build": "pnpm -r build",
     "dev": "pnpm -r --parallel dev",
     "test": "pnpm -r test",
+    "test:coverage": "pnpm -r test:coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "lint": "pnpm -r lint",
