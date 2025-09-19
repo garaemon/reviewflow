@@ -6,10 +6,11 @@ import { useSettingsStore } from '../store/settingsStore'
 interface CommitGraphProps {
   repositoryPath: string
   onCommitSelect: (baseCommit: string, targetCommit: string) => void
+  onUncommittedSelect: () => void
   selectedCommits?: { base?: string; target?: string }
 }
 
-export function CommitGraph({ repositoryPath, onCommitSelect, selectedCommits }: CommitGraphProps) {
+export function CommitGraph({ repositoryPath, onCommitSelect, onUncommittedSelect, selectedCommits }: CommitGraphProps) {
   const [commitGraph, setCommitGraph] = useState<CommitGraph | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -57,6 +58,10 @@ export function CommitGraph({ repositoryPath, onCommitSelect, selectedCommits }:
       setSelectedBase(commit.hash)
       setSelectedTarget(null)
     }
+  }
+
+  const handleUncommittedClick = () => {
+    onUncommittedSelect()
   }
 
   const resetSelection = () => {
@@ -175,6 +180,53 @@ export function CommitGraph({ repositoryPath, onCommitSelect, selectedCommits }:
 
       {/* Commit List */}
       <div className="max-h-96 overflow-y-auto">
+        {/* Uncommitted Changes */}
+        <div
+          onClick={handleUncommittedClick}
+          className={`px-4 py-3 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} cursor-pointer transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
+        >
+          <div className="flex items-start space-x-3">
+            {/* Commit graph line */}
+            <div className="flex flex-col items-center pt-1">
+              <div className={`w-3 h-3 rounded-full ${darkMode ? 'bg-orange-500' : 'bg-orange-400'}`} />
+              <div className={`w-0.5 h-6 mt-1 ${darkMode ? 'bg-gray-600' : 'bg-gray-300'}`} />
+            </div>
+
+            {/* Commit info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'} truncate`}>
+                  Uncommitted changes
+                </p>
+                <code className={`text-xs font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'} ml-2`}>
+                  working
+                </code>
+              </div>
+
+              <div className={`mt-1 flex items-center text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} space-x-4`}>
+                <div className="flex items-center">
+                  <User className="w-3 h-3 mr-1" />
+                  Local changes
+                </div>
+                <div className="flex items-center">
+                  <Calendar className="w-3 h-3 mr-1" />
+                  Not committed
+                </div>
+              </div>
+
+              <div className="mt-2">
+                <span
+                  className={`inline-block px-2 py-1 text-xs rounded mr-2 ${
+                    darkMode ? 'bg-orange-900 text-orange-200' : 'bg-orange-100 text-orange-700'
+                  }`}
+                >
+                  uncommitted
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {commitGraph.commits.map((commit, index) => (
           <div
             key={commit.hash}
