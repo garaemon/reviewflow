@@ -40,7 +40,7 @@ function NoteModal({ isOpen, onClose, onSave, lineNumber }: NoteModalProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-2xl mx-4`}>
-        <h3 className={`text-lg font-medium ${darkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+        <h3 className={`text-base font-medium ${darkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
           Add {type} {lineNumber && `(Line ${lineNumber})`}
         </h3>
         
@@ -194,7 +194,7 @@ export function ReviewSession() {
     return (
       <div className="text-center py-12">
         <GitCommit className={`h-12 w-12 ${darkMode ? 'text-gray-400' : 'text-gray-500'} mx-auto mb-4`} />
-        <h3 className={`text-lg font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+        <h3 className={`text-base font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
           No review session active
         </h3>
         <p className={`${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>

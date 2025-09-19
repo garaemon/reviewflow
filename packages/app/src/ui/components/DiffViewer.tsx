@@ -316,7 +316,7 @@ export function DiffViewer({ hunks, notes, onStatusChange, onAddNote }: DiffView
       {/* Progress Summary */}
       <div className={`${darkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-4`}>
         <div className="flex items-center justify-between mb-2">
-          <h3 className={`text-lg font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Progress</h3>
+          <h3 className={`text-base font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Progress</h3>
           <div className="flex items-center space-x-4">
             <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               {reviewedCount} / {totalCount} hunks reviewed

@@ -40,7 +40,7 @@ export function Settings() {
   return (
     <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 max-w-2xl border ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}>
       <div className="flex items-center justify-between mb-6">
-        <h2 className={`text-lg font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Settings</h2>
+        <h2 className={`text-base font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Settings</h2>
         <div className="flex space-x-2">
           <button
             onClick={handleReset}
