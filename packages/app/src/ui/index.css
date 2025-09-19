@@ -29,8 +29,22 @@ code {
 
 /* Diff specific optimizations */
 .diff-line {
-  height: 16px;
-  min-height: 16px;
+  height: 14px;
+  min-height: 14px;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+/* Improved diff container for long lines */
+.diff-container {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.diff-content {
+  white-space: pre;
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 /* High density code display */

@@ -59,7 +59,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
             <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
               {line.type === 'delete' ? '-' : ' '}
             </div>
-            <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre`}>
+            <div className={`flex-1 px-2 py-1 font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre overflow-x-auto`}>
               {line.type !== 'add' ? line.content : ''}
             </div>
           </div>
@@ -74,7 +74,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
             <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
               {line.type === 'add' ? '+' : ' '}
             </div>
-            <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre`}>
+            <div className={`flex-1 px-2 py-1 font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre overflow-x-auto`}>
               {line.type !== 'delete' ? line.content : ''}
             </div>
             <div className="flex-none opacity-0 group-hover:opacity-100 px-2 py-1">
@@ -106,7 +106,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
         <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
           {getLineSymbol()}
         </div>
-        <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre`}>
+        <div className={`flex-1 px-2 py-1 font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre overflow-x-auto`}>
           {line.content}
         </div>
         <div className="flex-none opacity-0 group-hover:opacity-100 px-2 py-1">
@@ -148,7 +148,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
                     {new Date(note.createdAt).toLocaleTimeString()}
                   </span>
                 </div>
-                <p className="text-sm text-gray-200 whitespace-pre-wrap">
+                <p className="text-2xs text-gray-200 whitespace-pre-wrap">
                   {note.content}
                 </p>
               </div>
@@ -194,7 +194,7 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
               <ChevronRight className="w-4 h-4" />
             )}
           </button>
-          <code className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'} font-mono`}>
+          <code className={`text-2xs ${darkMode ? 'text-gray-300' : 'text-gray-700'} font-mono`}>
             {hunk.header}
           </code>
           <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
@@ -260,7 +260,7 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
             {hunkNotes.map((note) => (
               <div
                 key={note.id}
-                className={`p-2 rounded border text-sm ${
+                className={`p-2 rounded border text-2xs ${
                   note.type === 'memo' 
                     ? 'bg-blue-900/20 border-blue-700/30 text-blue-200' 
                     : 'bg-yellow-900/20 border-yellow-700/30 text-yellow-200'
@@ -318,7 +318,7 @@ export function DiffViewer({ hunks, notes, onStatusChange, onAddNote }: DiffView
         <div className="flex items-center justify-between mb-2">
           <h3 className={`text-base font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Progress</h3>
           <div className="flex items-center space-x-4">
-            <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            <span className={`text-2xs ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               {reviewedCount} / {totalCount} hunks reviewed
             </span>
             {/* View Mode Indicator */}
