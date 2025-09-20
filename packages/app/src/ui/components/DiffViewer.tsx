@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronRight, Check, MessageSquare, StickyNote } from 'lucide-react'
-import type { DiffHunk, DiffLine, ReviewStatus, ReviewNote } from '@shared'
+import type { DiffHunk, DiffLine, ReviewStatus, ReviewNote } from '@reviewflow/shared'
 import { useSettingsStore } from '../store/settingsStore'
 
 interface DiffViewerProps {
@@ -49,33 +49,33 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
   // Split view rendering
   if (viewMode === 'split') {
     return (
-      <div className="flex">
+      <div className="flex min-h-[20px]">
         {/* Old line (left side) */}
-        <div className={`flex-1 ${line.type === 'delete' ? getLineClass() : darkMode ? 'bg-gray-900' : 'bg-gray-50'} border-r ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}>
-          <div className="flex group hover:bg-gray-750">
+        <div className={`flex-1 max-w-[50%] ${line.type === 'delete' ? getLineClass() : darkMode ? 'bg-gray-900' : 'bg-gray-50'} border-r ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}>
+          <div className="flex group hover:bg-gray-750 min-h-[20px]">
             <div className={`flex-none w-12 px-2 py-1 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right`}>
-              {line.type !== 'add' ? (line.oldLineNumber || '') : ''}
+              {(line.type === 'delete' || line.type === 'context') ? (line.oldLineNumber || '') : ''}
             </div>
             <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {line.type === 'delete' ? '-' : ' '}
+              {line.type === 'delete' ? '-' : (line.type === 'context' ? ' ' : '')}
             </div>
-            <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre`}>
-              {line.type !== 'add' ? line.content : ''}
+            <div className={`flex-1 px-2 py-1 font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre-wrap break-words overflow-hidden min-w-0`}>
+              {(line.type === 'delete' || line.type === 'context') ? line.content : ''}
             </div>
           </div>
         </div>
-        
+
         {/* New line (right side) */}
-        <div className={`flex-1 ${line.type === 'add' ? getLineClass() : darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-          <div className="flex group hover:bg-gray-750">
+        <div className={`flex-1 max-w-[50%] ${line.type === 'add' ? getLineClass() : darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+          <div className="flex group hover:bg-gray-750 min-h-[20px]">
             <div className={`flex-none w-12 px-2 py-1 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right`}>
-              {line.type !== 'delete' ? (line.newLineNumber || '') : ''}
+              {(line.type === 'add' || line.type === 'context') ? (line.newLineNumber || '') : ''}
             </div>
             <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {line.type === 'add' ? '+' : ' '}
+              {line.type === 'add' ? '+' : (line.type === 'context' ? ' ' : '')}
             </div>
-            <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre`}>
-              {line.type !== 'delete' ? line.content : ''}
+            <div className={`flex-1 px-2 py-1 font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre-wrap break-words overflow-hidden min-w-0`}>
+              {(line.type === 'add' || line.type === 'context') ? line.content : ''}
             </div>
             <div className="flex-none opacity-0 group-hover:opacity-100 px-2 py-1">
               <button
@@ -106,7 +106,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
         <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
           {getLineSymbol()}
         </div>
-        <div className={`flex-1 px-2 py-1 font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre`}>
+        <div className={`flex-1 px-2 py-1 font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre overflow-x-auto`}>
           {line.content}
         </div>
         <div className="flex-none opacity-0 group-hover:opacity-100 px-2 py-1">
@@ -148,7 +148,7 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
                     {new Date(note.createdAt).toLocaleTimeString()}
                   </span>
                 </div>
-                <p className="text-sm text-gray-200 whitespace-pre-wrap">
+                <p className="text-2xs text-gray-200 whitespace-pre-wrap">
                   {note.content}
                 </p>
               </div>
@@ -194,12 +194,23 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
               <ChevronRight className="w-4 h-4" />
             )}
           </button>
-          <code className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'} font-mono`}>
+          <code className={`text-2xs ${darkMode ? 'text-gray-300' : 'text-gray-700'} font-mono`}>
             {hunk.header}
           </code>
           <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
             {hunk.lines.length} lines
           </span>
+
+          {/* Diff Type Badge */}
+          {hunk.diffType && (
+            <span className={`text-xs px-2 py-1 rounded-full ${
+              hunk.diffType === 'staged'
+                ? 'bg-green-800 text-green-200'
+                : 'bg-orange-800 text-orange-200'
+            }`}>
+              {hunk.diffType}
+            </span>
+          )}
 
           {/* Review Status and Actions */}
           <div className="flex-1 flex items-center justify-end space-x-2">
@@ -249,7 +260,7 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
             {hunkNotes.map((note) => (
               <div
                 key={note.id}
-                className={`p-2 rounded border text-sm ${
+                className={`p-2 rounded border text-2xs ${
                   note.type === 'memo' 
                     ? 'bg-blue-900/20 border-blue-700/30 text-blue-200' 
                     : 'bg-yellow-900/20 border-yellow-700/30 text-yellow-200'
@@ -305,9 +316,9 @@ export function DiffViewer({ hunks, notes, onStatusChange, onAddNote }: DiffView
       {/* Progress Summary */}
       <div className={`${darkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-4`}>
         <div className="flex items-center justify-between mb-2">
-          <h3 className={`text-lg font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Progress</h3>
+          <h3 className={`text-base font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Progress</h3>
           <div className="flex items-center space-x-4">
-            <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            <span className={`text-2xs ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               {reviewedCount} / {totalCount} hunks reviewed
             </span>
             {/* View Mode Indicator */}

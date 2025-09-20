@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { ReviewConfig } from '@shared'
+import type { ReviewConfig } from '@reviewflow/shared'
 
 interface SettingsStore extends ReviewConfig {
   updateSetting: <K extends keyof ReviewConfig>(key: K, value: ReviewConfig[K]) => void

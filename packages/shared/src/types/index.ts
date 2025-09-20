@@ -7,6 +7,7 @@ export interface DiffHunk {
   header: string
   lines: DiffLine[]
   reviewStatus: ReviewStatus
+  diffType?: 'staged' | 'unstaged'
 }
 
 export interface DiffLine {

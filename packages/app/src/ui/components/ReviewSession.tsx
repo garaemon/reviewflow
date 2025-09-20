@@ -4,7 +4,7 @@ import { useReviewStore } from '../store/reviewStore'
 import { useSettingsStore } from '../store/settingsStore'
 import { FileViewer } from './FileViewer'
 import { CommitGraph } from './CommitGraph'
-import type { ReviewStatus } from '@shared'
+import type { ReviewStatus } from '@reviewflow/shared'
 
 interface NoteModalProps {
   isOpen: boolean
@@ -40,7 +40,7 @@ function NoteModal({ isOpen, onClose, onSave, lineNumber }: NoteModalProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-2xl mx-4`}>
-        <h3 className={`text-lg font-medium ${darkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+        <h3 className={`text-base font-medium ${darkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
           Add {type} {lineNumber && `(Line ${lineNumber})`}
         </h3>
         
@@ -114,7 +114,8 @@ export function ReviewSession() {
     updateHunkStatus,
     addNote,
     loadLatestSession,
-    createSession
+    createSession,
+    loadUncommittedChanges
   } = useReviewStore()
   const { darkMode } = useSettingsStore()
 
@@ -161,6 +162,13 @@ export function ReviewSession() {
     setShowCommitGraph(!showCommitGraph)
   }
 
+  const handleLoadUncommittedChanges = async () => {
+    if (currentSession?.repositoryPath) {
+      await loadUncommittedChanges(currentSession.repositoryPath)
+      setShowCommitGraph(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -186,7 +194,7 @@ export function ReviewSession() {
     return (
       <div className="text-center py-12">
         <GitCommit className={`h-12 w-12 ${darkMode ? 'text-gray-400' : 'text-gray-500'} mx-auto mb-4`} />
-        <h3 className={`text-lg font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+        <h3 className={`text-base font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
           No review session active
         </h3>
         <p className={`${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
@@ -207,11 +215,11 @@ export function ReviewSession() {
       {/* Session Header */}
       <div className={`${darkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-6`}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Code Review Session</h2>
+          <h2 className={`text-base font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Code Review Session</h2>
           <div className="flex items-center space-x-4">
             <button
               onClick={toggleCommitGraph}
-              className={`flex items-center px-3 py-2 rounded text-sm ${
+              className={`flex items-center px-3 py-2 rounded text-2xs ${
                 showCommitGraph
                   ? 'bg-blue-600 text-white'
                   : darkMode
@@ -219,62 +227,62 @@ export function ReviewSession() {
                   : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
               }`}
             >
-              <GitBranch className="w-4 h-4 mr-2" />
+              <GitBranch className="w-3 h-3 mr-2" />
               {showCommitGraph ? 'Hide Graph' : 'Select Commits'}
             </button>
-            <div className={`flex items-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              <Clock className="w-4 h-4 mr-1" aria-label="Last updated" />
+            <div className={`flex items-center text-2xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <Clock className="w-3 h-3 mr-1" aria-label="Last updated" />
               {new Date(currentSession.updatedAt).toLocaleString()}
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-3`}>
-            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-xs uppercase`}>Repository</div>
-            <div className={`font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} truncate`}>
+          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-2`}>
+            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-3xs uppercase`}>Repository</div>
+            <div className={`font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} truncate`}>
               {currentSession.repositoryPath}
             </div>
           </div>
-          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-3`}>
-            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-xs uppercase`}>Range</div>
-            <div className={`font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'} truncate`} title={`${currentSession.baseCommit}..${currentSession.targetCommit}`}>
+          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-2`}>
+            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-3xs uppercase`}>Range</div>
+            <div className={`font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} truncate`} title={`${currentSession.baseCommit}..${currentSession.targetCommit}`}>
               {currentSession.baseCommit.substring(0, 7)}..{currentSession.targetCommit.substring(0, 7)}
             </div>
           </div>
-          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-3`}>
-            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-xs uppercase`}>Files Changed</div>
-            <div className={`text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-2`}>
+            <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-3xs uppercase`}>Files Changed</div>
+            <div className={`text-2xs ${darkMode ? 'text-white' : 'text-gray-900'}`}>
               {currentSession.files.length} files
             </div>
           </div>
         </div>
 
         {/* Progress Overview */}
-        <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded-lg p-4`}>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Progress</h3>
-            <div className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              {reviewedHunks} / {totalHunks} hunks reviewed
+        <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded-lg p-3`}>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className={`text-2xs font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Progress</h3>
+            <div className={`text-3xs ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              {reviewedHunks} / {totalHunks} hunks
             </div>
           </div>
-          
-          <div className="flex items-center space-x-4 mb-2">
-            <div className="flex items-center text-sm">
-              <CheckCircle className="w-4 h-4 text-green-500 mr-1" aria-label="Reviewed and approved hunks" />
-              <span className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{reviewedHunks} reviewed</span>
+
+          <div className="flex items-center space-x-3 mb-1">
+            <div className="flex items-center text-3xs">
+              <CheckCircle className="w-3 h-3 text-green-500 mr-0.5" aria-label="Reviewed and approved hunks" />
+              <span className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{reviewedHunks}</span>
             </div>
-            <div className="flex items-center text-sm">
-              <Clock className={`w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-600'} mr-1`} aria-label="Hunks awaiting review" />
-              <span className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{unreviewedHunks} unreviewed</span>
+            <div className="flex items-center text-3xs">
+              <Clock className={`w-3 h-3 ${darkMode ? 'text-gray-500' : 'text-gray-600'} mr-0.5`} aria-label="Hunks awaiting review" />
+              <span className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{unreviewedHunks}</span>
             </div>
           </div>
-          
-          <div className={`w-full ${darkMode ? 'bg-gray-600' : 'bg-gray-300'} rounded-full h-2`}>
+
+          <div className={`w-full ${darkMode ? 'bg-gray-600' : 'bg-gray-300'} rounded-full h-1`}>
             <div
-              className="bg-green-500 h-2 rounded-full transition-all duration-500"
-              style={{ 
-                width: `${totalHunks > 0 ? (reviewedHunks / totalHunks) * 100 : 0}%` 
+              className="bg-green-500 h-1 rounded-full transition-all duration-500"
+              style={{
+                width: `${totalHunks > 0 ? (reviewedHunks / totalHunks) * 100 : 0}%`
               }}
             />
           </div>
@@ -286,6 +294,7 @@ export function ReviewSession() {
         <CommitGraph
           repositoryPath={currentSession.repositoryPath}
           onCommitSelect={handleCommitSelection}
+          onUncommittedSelect={handleLoadUncommittedChanges}
           selectedCommits={selectedCommits}
         />
       )}

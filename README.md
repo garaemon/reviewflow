@@ -29,7 +29,7 @@ A powerful local code review tool that enhances GitHub's review capabilities wit
    cd packages/cli
    pnpm link --global
    ```
-   
+
    Note: If you get "Unable to find the global bin directory" error, run:
    ```bash
    pnpm setup

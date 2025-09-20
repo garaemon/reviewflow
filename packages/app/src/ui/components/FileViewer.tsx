@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronRight, File, FileText, Plus, Minus, GitBranch } from 'lucide-react'
-import type { FileDiff, ReviewStatus, ReviewNote } from '@shared'
+import type { FileDiff, ReviewStatus, ReviewNote } from '@reviewflow/shared'
 import { DiffViewer } from './DiffViewer'
 import { useSettingsStore } from '../store/settingsStore'
 
@@ -74,7 +74,7 @@ export function FileViewer({ file, notes, onStatusChange, onAddNote }: FileViewe
 
             <div className="flex flex-col">
               <div className="flex items-center space-x-2">
-                <span className={`font-mono text-sm ${getStatusColor(file.status, darkMode)}`}>
+                <span className={`font-mono text-2xs ${getStatusColor(file.status, darkMode)}`}>
                   {file.path}
                 </span>
                 <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} capitalize`}>
@@ -90,7 +90,7 @@ export function FileViewer({ file, notes, onStatusChange, onAddNote }: FileViewe
             </div>
           </div>
 
-          <div className="flex items-center space-x-4 text-sm">
+          <div className="flex items-center space-x-4 text-2xs">
             {/* File Stats */}
             <div className="flex items-center space-x-3 text-xs">
               <span className="text-green-500">+{addedLines}</span>

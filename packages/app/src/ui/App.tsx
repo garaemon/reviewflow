@@ -15,12 +15,12 @@ function App() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <GitBranch className="h-8 w-8 text-blue-500 mr-3" aria-label="ReviewFlow - Code Review Tool" />
-              <h1 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>ReviewFlow</h1>
+              <h1 className={`text-base font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>ReviewFlow</h1>
             </div>
             <nav className="flex space-x-4">
               <button
                 onClick={() => setActiveTab('files')}
-                className={`px-3 py-2 rounded-md text-sm font-medium flex items-center ${
+                className={`px-3 py-2 rounded-md text-2xs font-medium flex items-center ${
                   activeTab === 'files'
                     ? 'bg-blue-600 text-white'
                     : darkMode 
@@ -34,7 +34,7 @@ function App() {
               </button>
               <button
                 onClick={() => setActiveTab('settings')}
-                className={`px-3 py-2 rounded-md text-sm font-medium flex items-center ${
+                className={`px-3 py-2 rounded-md text-2xs font-medium flex items-center ${
                   activeTab === 'settings'
                     ? 'bg-blue-600 text-white'
                     : darkMode
