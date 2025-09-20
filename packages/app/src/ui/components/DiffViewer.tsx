@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronRight, Check, MessageSquare, StickyNote } from 'lucide-react'
+import { ChevronDown, ChevronRight, Check, MessageSquare, StickyNote, Trash2 } from 'lucide-react'
 import type { DiffHunk, DiffLine, ReviewStatus, ReviewNote } from '@reviewflow/shared'
 import { useSettingsStore } from '../store/settingsStore'
 
@@ -8,6 +8,7 @@ interface DiffViewerProps {
   notes: Record<string, ReviewNote[]>
   onStatusChange: (hunkId: string, status: ReviewStatus) => void
   onAddNote: (hunkId: string, lineNumber?: number) => void
+  onDeleteNote: (noteId: string) => void
 }
 
 interface DiffLineProps {
@@ -15,9 +16,10 @@ interface DiffLineProps {
   hunkId: string
   notes: ReviewNote[]
   onAddNote: (hunkId: string, lineNumber?: number) => void
+  onDeleteNote: (noteId: string) => void
 }
 
-function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
+function DiffLineComponent({ line, hunkId, notes, onAddNote, onDeleteNote }: DiffLineProps) {
   const { darkMode, viewMode } = useSettingsStore()
   
   const getLineClass = () => {
@@ -144,9 +146,18 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
                   <span className="text-xs text-gray-400">
                     {note.type === 'memo' ? 'Personal memo' : 'Review comment'}
                   </span>
-                  <span className="text-xs text-gray-500">
-                    {new Date(note.createdAt).toLocaleTimeString()}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">
+                      {new Date(note.createdAt).toLocaleTimeString()}
+                    </span>
+                    <button
+                      onClick={() => onDeleteNote(note.id)}
+                      className={`${darkMode ? 'text-gray-400 hover:text-red-400' : 'text-gray-500 hover:text-red-600'} transition-colors`}
+                      title="Delete note"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
                 </div>
                 <p className="text-2xs text-gray-200 whitespace-pre-wrap">
                   {note.content}
@@ -165,9 +176,10 @@ interface HunkViewerProps {
   notes: ReviewNote[]
   onStatusChange: (hunkId: string, status: ReviewStatus) => void
   onAddNote: (hunkId: string, lineNumber?: number) => void
+  onDeleteNote: (noteId: string) => void
 }
 
-function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps) {
+function HunkViewer({ hunk, notes, onStatusChange, onAddNote, onDeleteNote }: HunkViewerProps) {
   const [isExpanded, setIsExpanded] = useState(true)
   const { darkMode } = useSettingsStore()
 
@@ -275,7 +287,16 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
                     )}
                   </div>
                   <div className="flex-1">
-                    <p className="whitespace-pre-wrap">{note.content}</p>
+                    <div className="flex items-start justify-between">
+                      <p className="whitespace-pre-wrap flex-1">{note.content}</p>
+                      <button
+                        onClick={() => onDeleteNote(note.id)}
+                        className={`ml-2 ${darkMode ? 'text-gray-400 hover:text-red-400' : 'text-gray-500 hover:text-red-600'} transition-colors`}
+                        title="Delete note"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
                     <span className="text-xs opacity-75">
                       {new Date(note.createdAt).toLocaleTimeString()}
                     </span>
@@ -297,6 +318,7 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
               hunkId={hunk.id}
               notes={notes}
               onAddNote={onAddNote}
+              onDeleteNote={onDeleteNote}
             />
           ))}
         </div>
@@ -305,7 +327,7 @@ function HunkViewer({ hunk, notes, onStatusChange, onAddNote }: HunkViewerProps)
   )
 }
 
-export function DiffViewer({ hunks, notes, onStatusChange, onAddNote }: DiffViewerProps) {
+export function DiffViewer({ hunks, notes, onStatusChange, onAddNote, onDeleteNote }: DiffViewerProps) {
   const { viewMode, darkMode } = useSettingsStore()
 
   const reviewedCount = hunks.filter(h => h.reviewStatus === 'reviewed').length
@@ -348,6 +370,7 @@ export function DiffViewer({ hunks, notes, onStatusChange, onAddNote }: DiffView
             notes={notes[hunk.id] || []}
             onStatusChange={onStatusChange}
             onAddNote={onAddNote}
+            onDeleteNote={onDeleteNote}
           />
         ))
       )}
