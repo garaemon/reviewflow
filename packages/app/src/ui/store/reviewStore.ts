@@ -15,6 +15,7 @@ interface ReviewStore {
   loadUncommittedChanges: (repositoryPath: string) => Promise<void>
   updateHunkStatus: (hunkId: string, status: ReviewStatus) => Promise<void>
   addNote: (hunkId: string, content: string, type: 'memo' | 'comment', lineNumber?: number) => Promise<void>
+  deleteNote: (noteId: string) => Promise<void>
 
   // Mock data for development
   loadMockSession: () => void
@@ -414,6 +415,42 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
       if (type === 'memo') {
         // Note: We no longer automatically change status when adding notes
       }
+    }
+  },
+
+  deleteNote: async (noteId: string) => {
+    try {
+      // Try API call first
+      const response = await fetch(`/api/review/notes/${noteId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        console.log('API delete failed, proceeding with local deletion')
+      }
+
+      // Update local notes regardless of API response
+      const currentNotes = get().notes
+      const updatedNotes: Record<string, ReviewNote[]> = {}
+
+      // Remove the note from all hunks
+      Object.keys(currentNotes).forEach(hunkId => {
+        updatedNotes[hunkId] = currentNotes[hunkId].filter(note => note.id !== noteId)
+      })
+
+      set({ notes: updatedNotes })
+    } catch (error) {
+      console.error('Failed to delete note:', error)
+
+      // Fallback for network errors - delete locally anyway
+      const currentNotes = get().notes
+      const updatedNotes: Record<string, ReviewNote[]> = {}
+
+      Object.keys(currentNotes).forEach(hunkId => {
+        updatedNotes[hunkId] = currentNotes[hunkId].filter(note => note.id !== noteId)
+      })
+
+      set({ notes: updatedNotes })
     }
   },
 

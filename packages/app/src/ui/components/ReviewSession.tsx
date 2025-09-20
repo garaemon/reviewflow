@@ -113,6 +113,7 @@ export function ReviewSession() {
     notes,
     updateHunkStatus,
     addNote,
+    deleteNote,
     loadLatestSession,
     createSession,
     loadUncommittedChanges
@@ -147,6 +148,10 @@ export function ReviewSession() {
   const handleSaveNote = async (content: string, type: 'memo' | 'comment') => {
     await addNote(noteModal.hunkId, content, type, noteModal.lineNumber)
     setNoteModal({ isOpen: false, hunkId: '' })
+  }
+
+  const handleDeleteNote = async (noteId: string) => {
+    await deleteNote(noteId)
   }
 
   const handleCommitSelection = async (baseCommit: string, targetCommit: string) => {
@@ -307,6 +312,7 @@ export function ReviewSession() {
           notes={notes}
           onStatusChange={handleStatusChange}
           onAddNote={handleAddNote}
+          onDeleteNote={handleDeleteNote}
         />
       ))}
 

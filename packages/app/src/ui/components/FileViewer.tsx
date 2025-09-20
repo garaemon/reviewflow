@@ -9,6 +9,7 @@ interface FileViewerProps {
   notes: Record<string, ReviewNote[]>
   onStatusChange: (hunkId: string, status: ReviewStatus) => void
   onAddNote: (hunkId: string, lineNumber?: number) => void
+  onDeleteNote: (noteId: string) => void
 }
 
 function getFileIcon(status: FileDiff['status']) {
@@ -39,7 +40,7 @@ function getStatusColor(status: FileDiff['status'], darkMode: boolean) {
   }
 }
 
-export function FileViewer({ file, notes, onStatusChange, onAddNote }: FileViewerProps) {
+export function FileViewer({ file, notes, onStatusChange, onAddNote, onDeleteNote }: FileViewerProps) {
   const [isExpanded, setIsExpanded] = useState(true)
   const { darkMode } = useSettingsStore()
 
@@ -138,6 +139,7 @@ export function FileViewer({ file, notes, onStatusChange, onAddNote }: FileViewe
                 notes={notes}
                 onStatusChange={onStatusChange}
                 onAddNote={onAddNote}
+                onDeleteNote={onDeleteNote}
               />
             </div>
           )}
