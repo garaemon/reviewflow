@@ -49,33 +49,33 @@ function DiffLineComponent({ line, hunkId, notes, onAddNote }: DiffLineProps) {
   // Split view rendering
   if (viewMode === 'split') {
     return (
-      <div className="flex">
+      <div className="flex min-h-[20px]">
         {/* Old line (left side) */}
         <div className={`flex-1 ${line.type === 'delete' ? getLineClass() : darkMode ? 'bg-gray-900' : 'bg-gray-50'} border-r ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}>
-          <div className="flex group hover:bg-gray-750">
+          <div className="flex group hover:bg-gray-750 min-h-[20px]">
             <div className={`flex-none w-12 px-2 py-1 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right`}>
-              {line.type !== 'add' ? (line.oldLineNumber || '') : ''}
+              {(line.type === 'delete' || line.type === 'context') ? (line.oldLineNumber || '') : ''}
             </div>
             <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {line.type === 'delete' ? '-' : ' '}
+              {line.type === 'delete' ? '-' : (line.type === 'context' ? ' ' : '')}
             </div>
             <div className={`flex-1 px-2 py-1 font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre overflow-x-auto`}>
-              {line.type !== 'add' ? line.content : ''}
+              {(line.type === 'delete' || line.type === 'context') ? line.content : ''}
             </div>
           </div>
         </div>
-        
+
         {/* New line (right side) */}
         <div className={`flex-1 ${line.type === 'add' ? getLineClass() : darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-          <div className="flex group hover:bg-gray-750">
+          <div className="flex group hover:bg-gray-750 min-h-[20px]">
             <div className={`flex-none w-12 px-2 py-1 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'} text-right`}>
-              {line.type !== 'delete' ? (line.newLineNumber || '') : ''}
+              {(line.type === 'add' || line.type === 'context') ? (line.newLineNumber || '') : ''}
             </div>
             <div className={`flex-none w-6 px-1 py-1 text-xs text-center font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {line.type === 'add' ? '+' : ' '}
+              {line.type === 'add' ? '+' : (line.type === 'context' ? ' ' : '')}
             </div>
             <div className={`flex-1 px-2 py-1 font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} whitespace-pre overflow-x-auto`}>
-              {line.type !== 'delete' ? line.content : ''}
+              {(line.type === 'add' || line.type === 'context') ? line.content : ''}
             </div>
             <div className="flex-none opacity-0 group-hover:opacity-100 px-2 py-1">
               <button
