@@ -15,6 +15,11 @@ export class GitService {
     return this.parseDiffText(diffText)
   }
 
+  async getUncommittedDiff(): Promise<FileDiff[]> {
+    const diffText = await this.git.diff(['--unified=3'])
+    return this.parseDiffText(diffText)
+  }
+
   async getStatus() {
     const status = await this.git.status()
     return {

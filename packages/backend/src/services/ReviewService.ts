@@ -1,5 +1,4 @@
-import type { ReviewNote, ReviewStatus, FileDiff } from '@reviewflow/shared'
-import { generateId } from '@reviewflow/shared'
+import type { FileDiff } from '@reviewflow/shared'
 import { GitService } from './GitService'
 
 export class ReviewService {
