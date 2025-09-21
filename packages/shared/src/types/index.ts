@@ -25,15 +25,6 @@ export interface FileDiff {
   binary: boolean
 }
 
-export interface ReviewSession {
-  id: string
-  repositoryPath: string
-  baseCommit: string
-  targetCommit: string
-  createdAt: string
-  updatedAt: string
-  files: FileDiff[]
-}
 
 export type ReviewStatus = 'reviewed' | 'unreviewed'
 
