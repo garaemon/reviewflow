@@ -36,13 +36,15 @@ describe('Express App', () => {
 
   describe('API routes', () => {
     it('should respond to review routes', async () => {
-      // Test that review route exists
+      // Test that review route exists and returns repo config
       await request(app)
         .get('/api/review/current-repo')
         .expect((res) => {
-          // Should return 404 for missing repo info, not route not found
-          expect(res.status).toBe(404)
-          expect(res.body.error).toBe('No current repository info found')
+          // Should return 200 with repo config since it's always set
+          expect(res.status).toBe(200)
+          expect(res.body).toHaveProperty('repositoryPath')
+          expect(res.body).toHaveProperty('baseCommit')
+          expect(res.body).toHaveProperty('targetCommit')
         })
     })
 
