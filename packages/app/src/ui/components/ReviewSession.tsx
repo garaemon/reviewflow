@@ -137,7 +137,7 @@ export function ReviewSession() {
   useEffect(() => {
     // Try to load from current repo info or fallback to mock data
     loadCurrentRepo()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadCurrentRepo = async () => {
     try {
