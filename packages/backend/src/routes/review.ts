@@ -1,17 +1,13 @@
 import { Router } from 'express'
-import { readFileSync } from 'fs'
-import { join } from 'path'
 
 const router = Router()
 
-router.get('/current-repo', async (_req, res) => {
-  try {
-    const repoInfoPath = join(process.cwd(), '.cache/reviewflow/sessions/current-repo.json')
-    const repoInfo = JSON.parse(readFileSync(repoInfoPath, 'utf-8'))
-    res.json(repoInfo)
-  } catch (error) {
-    res.status(404).json({ error: 'No current repository info found' })
+router.get('/current-repo', async (req, res) => {
+  const repoConfig = req.app.locals.repoConfig
+  if (!repoConfig) {
+    return res.status(404).json({ error: 'No repository config found' })
   }
+  res.json(repoConfig)
 })
 
 export { router as reviewRoutes }

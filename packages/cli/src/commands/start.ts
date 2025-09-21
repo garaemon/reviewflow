@@ -3,7 +3,6 @@ import { existsSync } from 'fs'
 import { spawn } from 'child_process'
 import chalk from 'chalk'
 import open from 'open'
-import { getSessionDir } from '../utils/config.js'
 
 interface StartOptions {
   range: string
@@ -13,7 +12,6 @@ interface StartOptions {
 
 export async function startCommand(options: StartOptions) {
   const cwd = process.cwd()
-  const sessionDir = getSessionDir()
 
   console.log(chalk.blue('🚀 Starting ReviewFlow...'))
   console.log()
@@ -34,7 +32,13 @@ export async function startCommand(options: StartOptions) {
   // Start the ReviewFlow servers
   console.log(chalk.blue('Starting ReviewFlow servers...'))
   
-  const backendProcess = spawn('pnpm', ['--filter', '@reviewflow/backend', 'dev'], {
+  const backendProcess = spawn('pnpm', [
+    '--filter', '@reviewflow/backend', 'dev',
+    '--',
+    '--repo-path', cwd,
+    '--base-commit', baseCommit,
+    '--target-commit', targetCommit
+  ], {
     stdio: 'pipe',
     cwd: findReviewFlowRoot()
   })
@@ -54,18 +58,8 @@ export async function startCommand(options: StartOptions) {
 
   // Wait a bit for server to start
   await new Promise(resolve => setTimeout(resolve, 3000))
-  
-  // Store the current repository info for the frontend to use
-  const repoInfoPath = join(sessionDir, 'current-repo.json')
-  const fs = await import('fs')
-  await fs.promises.writeFile(repoInfoPath, JSON.stringify({
-    repositoryPath: cwd,
-    baseCommit,
-    targetCommit,
-    createdAt: new Date().toISOString()
-  }, null, 2))
 
-  console.log(chalk.green('✓ Repository info saved'))
+  console.log(chalk.green('✓ Repository info passed to backend'))
   
   const url = `http://localhost:${options.port}`
   
