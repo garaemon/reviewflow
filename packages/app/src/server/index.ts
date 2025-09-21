@@ -2,9 +2,6 @@ import express from 'express'
 import cors from 'cors'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
-import { reviewRoutes } from './routes/review.js'
-import { gitRoutes } from './routes/git.js'
-import { settingsRoutes } from './routes/settings.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
