@@ -38,11 +38,11 @@ describe('Express App', () => {
     it('should respond to review routes', async () => {
       // Test that review route exists
       await request(app)
-        .get('/api/review/current-session')
+        .get('/api/review/current-repo')
         .expect((res) => {
-          // Should return 404 for missing session, not route not found
+          // Should return 404 for missing repo info, not route not found
           expect(res.status).toBe(404)
-          expect(res.body.error).toBe('No current session found')
+          expect(res.body.error).toBe('No current repository info found')
         })
     })
 
