@@ -146,13 +146,11 @@ export function ReviewSession() {
         const repoInfo = await response.json()
         await loadDiff(repoInfo.repositoryPath, repoInfo.baseCommit, repoInfo.targetCommit)
       } else {
-        // Fallback to mock data for development
-        useReviewStore.getState().loadMockData()
+        console.warn('No repository config found, please start with "review start" command')
       }
     } catch (error) {
       console.error('Failed to load current repo info:', error)
-      // Fallback to mock data
-      useReviewStore.getState().loadMockData()
+      console.warn('Please start ReviewFlow with the "review start" command')
     }
   }
 

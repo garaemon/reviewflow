@@ -18,13 +18,39 @@ app.use(express.json())
 // Static file serving
 app.use(express.static(resolve(__dirname, '../../dist/public')))
 
-// API routes
-app.use('/api/review', reviewRoutes)
-app.use('/api/git', gitRoutes)
-app.use('/api/settings', settingsRoutes)
+// Proxy API requests to backend server
+app.use('/api', async (req, res) => {
+  try {
+    const backendUrl = `http://localhost:3001${req.originalUrl}`
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    }
 
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+    // Copy relevant headers, filtering out problematic ones
+    const allowedHeaders = ['authorization', 'user-agent', 'accept']
+    allowedHeaders.forEach(header => {
+      if (req.headers[header] && typeof req.headers[header] === 'string') {
+        headers[header] = req.headers[header] as string
+      }
+    })
+
+    const response = await fetch(backendUrl, {
+      method: req.method,
+      headers,
+      body: req.method !== 'GET' && req.method !== 'HEAD' ? JSON.stringify(req.body) : undefined
+    })
+
+    if (!response.ok) {
+      console.error(`Backend error: ${response.status} ${response.statusText}`)
+      return res.status(response.status).json({ error: response.statusText })
+    }
+
+    const data = await response.json()
+    res.json(data)
+  } catch (error) {
+    console.error('Proxy error:', error)
+    res.status(500).json({ error: 'Proxy error' })
+  }
 })
 
 // SPA fallback - serve index.html for non-API routes
