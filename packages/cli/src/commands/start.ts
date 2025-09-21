@@ -3,7 +3,6 @@ import { existsSync } from 'fs'
 import { spawn } from 'child_process'
 import chalk from 'chalk'
 import open from 'open'
-import { getSessionDir } from '../utils/config.js'
 
 interface StartOptions {
   range: string
@@ -13,7 +12,6 @@ interface StartOptions {
 
 export async function startCommand(options: StartOptions) {
   const cwd = process.cwd()
-  const sessionDir = getSessionDir()
 
   console.log(chalk.blue('🚀 Starting ReviewFlow...'))
   console.log()
@@ -34,12 +32,18 @@ export async function startCommand(options: StartOptions) {
   // Start the ReviewFlow servers
   console.log(chalk.blue('Starting ReviewFlow servers...'))
   
-  const backendProcess = spawn('pnpm', ['--filter', '@reviewflow/backend', 'dev'], {
+  const backendProcess = spawn('pnpm', [
+    '--filter', '@reviewflow/backend', 'dev',
+    '--',
+    '--repo-path', cwd,
+    '--base-commit', baseCommit,
+    '--target-commit', targetCommit
+  ], {
     stdio: 'pipe',
     cwd: findReviewFlowRoot()
   })
   
-  const frontendProcess = spawn('pnpm', ['--filter', '@reviewflow/frontend', 'dev'], {
+  const frontendProcess = spawn('pnpm', ['--filter', '@reviewflow/app', 'dev'], {
     stdio: 'pipe',
     cwd: findReviewFlowRoot()
   })
@@ -54,47 +58,8 @@ export async function startCommand(options: StartOptions) {
 
   // Wait a bit for server to start
   await new Promise(resolve => setTimeout(resolve, 3000))
-  
-  // Create a review session via API
-  try {
-    console.log(chalk.blue('Creating review session...'))
-    
-    const response = await fetch('http://localhost:3001/api/review/sessions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        repositoryPath: cwd,
-        baseCommit,
-        targetCommit
-      })
-    })
-    
-    if (!response.ok) {
-      throw new Error(`Failed to create session: ${response.statusText}`)
-    }
-    
-    const session = await response.json() as any
-    console.log(chalk.green('✓ Review session created'))
-    console.log(chalk.gray('Session ID:'), session.id)
-    
-    // Store the current session ID for the frontend to use
-    const sessionInfoPath = join(sessionDir, 'current-session.json')
-    const fs = await import('fs')
-    await fs.promises.writeFile(sessionInfoPath, JSON.stringify({
-      sessionId: session.id,
-      repositoryPath: cwd,
-      baseCommit,
-      targetCommit,
-      createdAt: new Date().toISOString()
-    }, null, 2))
-    
-  } catch (error) {
-    console.log(chalk.yellow('⚠️  Could not create session via API'))
-    console.log(chalk.gray('Server may still be starting up...'))
-    console.log(chalk.gray('Error:'), error instanceof Error ? error.message : 'Unknown error')
-  }
+
+  console.log(chalk.green('✓ Repository info passed to backend'))
   
   const url = `http://localhost:${options.port}`
   

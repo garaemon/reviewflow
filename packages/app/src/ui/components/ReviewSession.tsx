@@ -43,7 +43,7 @@ function NoteModal({ isOpen, onClose, onSave, lineNumber }: NoteModalProps) {
         <h3 className={`text-base font-medium ${darkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
           Add {type} {lineNumber && `(Line ${lineNumber})`}
         </h3>
-        
+
         <div className="mb-4">
           <div className="flex space-x-4 mb-3">
             <label className="flex items-center">
@@ -69,7 +69,7 @@ function NoteModal({ isOpen, onClose, onSave, lineNumber }: NoteModalProps) {
               <span className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Review Comment</span>
             </label>
           </div>
-          
+
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -79,7 +79,7 @@ function NoteModal({ isOpen, onClose, onSave, lineNumber }: NoteModalProps) {
             autoFocus
           />
         </div>
-        
+
         <div className="flex justify-between items-center">
           <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
             Press Escape to cancel, Ctrl+Enter to save
@@ -107,15 +107,17 @@ function NoteModal({ isOpen, onClose, onSave, lineNumber }: NoteModalProps) {
 
 export function ReviewSession() {
   const {
-    currentSession,
+    currentFiles,
+    repositoryPath,
+    baseCommit,
+    targetCommit,
     loading,
     error,
     notes,
     updateHunkStatus,
     addNote,
     deleteNote,
-    loadLatestSession,
-    createSession,
+    loadDiff,
     loadUncommittedChanges
   } = useReviewStore()
   const { darkMode } = useSettingsStore()
@@ -133,33 +135,48 @@ export function ReviewSession() {
   }>({})
 
   useEffect(() => {
-    // Load latest session or fall back to mock session
-    loadLatestSession()
-  }, [loadLatestSession])
+    // Try to load from current repo info or fallback to mock data
+    loadCurrentRepo()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleStatusChange = async (hunkId: string, status: ReviewStatus) => {
-    await updateHunkStatus(hunkId, status)
+  const loadCurrentRepo = async () => {
+    try {
+      const response = await fetch('/api/review/current-repo')
+      if (response.ok) {
+        const repoInfo = await response.json()
+        await loadDiff(repoInfo.repositoryPath, repoInfo.baseCommit, repoInfo.targetCommit)
+      } else {
+        console.warn('No repository config found, please start with "review start" command')
+      }
+    } catch (error) {
+      console.error('Failed to load current repo info:', error)
+      console.warn('Please start ReviewFlow with the "review start" command')
+    }
+  }
+
+  const handleStatusChange = (hunkId: string, status: ReviewStatus) => {
+    updateHunkStatus(hunkId, status)
   }
 
   const handleAddNote = (hunkId: string, lineNumber?: number) => {
     setNoteModal({ isOpen: true, hunkId, lineNumber })
   }
 
-  const handleSaveNote = async (content: string, type: 'memo' | 'comment') => {
-    await addNote(noteModal.hunkId, content, type, noteModal.lineNumber)
+  const handleSaveNote = (content: string, type: 'memo' | 'comment') => {
+    addNote(noteModal.hunkId, content, type, noteModal.lineNumber)
     setNoteModal({ isOpen: false, hunkId: '' })
   }
 
-  const handleDeleteNote = async (noteId: string) => {
-    await deleteNote(noteId)
+  const handleDeleteNote = (noteId: string) => {
+    deleteNote(noteId)
   }
 
   const handleCommitSelection = async (baseCommit: string, targetCommit: string) => {
     setSelectedCommits({ base: baseCommit, target: targetCommit })
     setShowCommitGraph(false)
 
-    if (currentSession?.repositoryPath) {
-      await createSession(currentSession.repositoryPath, baseCommit, targetCommit)
+    if (repositoryPath) {
+      await loadDiff(repositoryPath, baseCommit, targetCommit)
     }
   }
 
@@ -168,8 +185,8 @@ export function ReviewSession() {
   }
 
   const handleLoadUncommittedChanges = async () => {
-    if (currentSession?.repositoryPath) {
-      await loadUncommittedChanges(currentSession.repositoryPath)
+    if (repositoryPath) {
+      await loadUncommittedChanges(repositoryPath)
       setShowCommitGraph(false)
     }
   }
@@ -178,7 +195,7 @@ export function ReviewSession() {
     return (
       <div className="flex items-center justify-center py-12">
         <RefreshCw className="w-8 h-8 animate-spin text-blue-500" />
-        <span className={`ml-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading review session...</span>
+        <span className={`ml-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading diff...</span>
       </div>
     )
   }
@@ -188,19 +205,19 @@ export function ReviewSession() {
       <div className="flex items-center justify-center py-12">
         <AlertCircle className="w-8 h-8 text-red-500 mr-3" />
         <div className="text-red-400">
-          <p className="font-medium">Failed to load review session</p>
+          <p className="font-medium">Failed to load diff</p>
           <p className="text-sm">{error}</p>
         </div>
       </div>
     )
   }
 
-  if (!currentSession) {
+  if (!repositoryPath || currentFiles.length === 0) {
     return (
       <div className="text-center py-12">
         <GitCommit className={`h-12 w-12 ${darkMode ? 'text-gray-400' : 'text-gray-500'} mx-auto mb-4`} />
         <h3 className={`text-base font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-          No review session active
+          No diff available
         </h3>
         <p className={`${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
           Start a review session using the CLI: <code className={`${darkMode ? 'bg-gray-800' : 'bg-gray-200'} px-2 py-1 rounded`}>review start</code>
@@ -209,18 +226,18 @@ export function ReviewSession() {
     )
   }
 
-  const totalHunks = currentSession.files.reduce((sum: number, file: any) => sum + file.hunks.length, 0)
-  const reviewedHunks = currentSession.files.reduce((sum: number, file: any) => 
+  const totalHunks = currentFiles.reduce((sum: number, file: any) => sum + file.hunks.length, 0)
+  const reviewedHunks = currentFiles.reduce((sum: number, file: any) =>
     sum + file.hunks.filter((hunk: any) => hunk.reviewStatus === 'reviewed').length, 0)
-  const unreviewedHunks = currentSession.files.reduce((sum: number, file: any) => 
+  const unreviewedHunks = currentFiles.reduce((sum: number, file: any) =>
     sum + file.hunks.filter((hunk: any) => hunk.reviewStatus === 'unreviewed').length, 0)
 
   return (
     <div className="space-y-6">
-      {/* Session Header */}
+      {/* Header */}
       <div className={`${darkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-6`}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className={`text-base font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Code Review Session</h2>
+          <h2 className={`text-base font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Code Review</h2>
           <div className="flex items-center space-x-4">
             <button
               onClick={toggleCommitGraph}
@@ -235,10 +252,6 @@ export function ReviewSession() {
               <GitBranch className="w-3 h-3 mr-2" />
               {showCommitGraph ? 'Hide Graph' : 'Select Commits'}
             </button>
-            <div className={`flex items-center text-2xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              <Clock className="w-3 h-3 mr-1" aria-label="Last updated" />
-              {new Date(currentSession.updatedAt).toLocaleString()}
-            </div>
           </div>
         </div>
 
@@ -246,19 +259,19 @@ export function ReviewSession() {
           <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-2`}>
             <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-3xs uppercase`}>Repository</div>
             <div className={`font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} truncate`}>
-              {currentSession.repositoryPath}
+              {repositoryPath}
             </div>
           </div>
           <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-2`}>
             <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-3xs uppercase`}>Range</div>
-            <div className={`font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} truncate`} title={`${currentSession.baseCommit}..${currentSession.targetCommit}`}>
-              {currentSession.baseCommit.substring(0, 7)}..{currentSession.targetCommit.substring(0, 7)}
+            <div className={`font-mono text-2xs ${darkMode ? 'text-white' : 'text-gray-900'} truncate`}>
+              {baseCommit && targetCommit ? `${baseCommit.substring(0, 7)}..${targetCommit.substring(0, 7)}` : 'N/A'}
             </div>
           </div>
           <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded p-2`}>
             <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-3xs uppercase`}>Files Changed</div>
             <div className={`text-2xs ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              {currentSession.files.length} files
+              {currentFiles.length} files
             </div>
           </div>
         </div>
@@ -295,9 +308,9 @@ export function ReviewSession() {
       </div>
 
       {/* Commit Graph */}
-      {showCommitGraph && currentSession && (
+      {showCommitGraph && repositoryPath && (
         <CommitGraph
-          repositoryPath={currentSession.repositoryPath}
+          repositoryPath={repositoryPath}
           onCommitSelect={handleCommitSelection}
           onUncommittedSelect={handleLoadUncommittedChanges}
           selectedCommits={selectedCommits}
@@ -305,7 +318,7 @@ export function ReviewSession() {
       )}
 
       {/* File List */}
-      {currentSession.files.map((file: any) => (
+      {currentFiles.map((file: any) => (
         <FileViewer
           key={file.path}
           file={file}

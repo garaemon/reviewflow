@@ -24,21 +24,42 @@ router.post('/diff', async (req, res) => {
   }
 })
 
+router.post('/uncommitted-diff', async (req, res) => {
+  try {
+    const { repositoryPath } = req.body
+
+    if (!repositoryPath) {
+      return res.status(400).json({ error: 'Repository path is required' })
+    }
+
+    const gitService = new GitService(repositoryPath)
+    const files = await gitService.getUncommittedDiff()
+
+    res.json(files)
+  } catch (error) {
+    console.error('Error getting uncommitted diff:', error)
+    res.status(500).json({
+      error: 'Failed to get uncommitted diff',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
+})
+
 router.get('/status/:repositoryPath(*)', async (req, res) => {
   try {
     const repositoryPath = req.params.repositoryPath
-    
+
     if (!repositoryPath) {
       return res.status(400).json({ error: 'Repository path is required' })
     }
 
     const gitService = new GitService(repositoryPath)
     const status = await gitService.getStatus()
-    
+
     res.json(status)
   } catch (error) {
     console.error('Error getting git status:', error)
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to get git status',
       message: error instanceof Error ? error.message : 'Unknown error'
     })
