@@ -17,8 +17,8 @@
     "uninstall-cli": "cd packages/cli && npm unlink -g @reviewflow/cli"
   },
   "workspaces": [
-    "packages/frontend",
-    "packages/backend", 
+    "packages/app",
+    "packages/backend",
     "packages/cli",
     "packages/shared"
   ],

@@ -43,7 +43,7 @@ export async function startCommand(options: StartOptions) {
     cwd: findReviewFlowRoot()
   })
   
-  const frontendProcess = spawn('pnpm', ['--filter', '@reviewflow/frontend', 'dev'], {
+  const frontendProcess = spawn('pnpm', ['--filter', '@reviewflow/app', 'dev'], {
     stdio: 'pipe',
     cwd: findReviewFlowRoot()
   })
